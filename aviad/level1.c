@@ -5,17 +5,33 @@
 #define START_LINE 100 /*defualt start*/
 #define LINE_LEN 80 /*defualt line */
 int issymbol(char *p);
+typedef struct command
+      {
+      char *name;
+      void(*func)(char *command);
+      }cmd[]={
+             {"read_comp",read_comp},
+             {"print_comp",print_comp},
+             {"add_comp",add_comp},
+             {"sub_comp",sub_comp},
+             {"mult_comp_real",mult_comp_real},
+             {"mult_comp_img",mult_comp_img},
+             {"mult_comp_comp",mult_comp_comp},
+             {"abs_comp",abs_comp},
+       {"halt\n",halt},
+       {"error",NULL}};
 typedef struct symbol_tree {
     char *symbol;
     int address;
     struct symbol_tree *ls, *rs;
 } symbol_tree;
-enum flags{};
+enum SYMBOL{TRUTH,FALSE};
 
 int main(int argc, char const *argv[]) {
   FILE  *fp;
+  char *dataStorage[]={".data",".string",".mat"};
   char line[LINE_LEN],*fild;
-  int address ;
+  int address ,symbolFlag;
   address =START_LINE;
 fp=fopen(argv[1],"r");
 if (!fp) {
@@ -26,9 +42,16 @@ if (!fp) {
 while (!(fgets(line,LINE_LEN,fp)))
 {
   int i;
+  int flag;
   fild=strtok(line,"");
-
-
+  if((flag=issymbol(fild))==1)/*is symbol*/
+  {
+    symbolFlag=TRUTH;
+  }
+  else if (flag==-1) {
+    /* code */
+  }
+  isdataStorage()
 }
 
   return 0;
@@ -58,7 +81,7 @@ void insert(symbol_tree **root, char *symbol,int address) {
 int issymbol(char *p)
 {
     int i=0;
-    if(!(isalpha(p[i])))
+    if(!(isalpha(p[i])&&p[i]!='.'))
     {
     printf("unligal word : %s \n",p);
     return -1;
