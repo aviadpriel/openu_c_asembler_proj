@@ -6,6 +6,7 @@
 typedef enum {ON,OFF,WHIT} SWITCHER;
 char * isSymbol(char *p,int *error);
 int isGuidelineStatement(char *p);
+void insertData(dataList **head,unsigned data);
 typedef struct commends
 {
 char *command;
@@ -111,14 +112,54 @@ char * isSymbol(char *p,int *error)
       else
       i++;
   }
-*error=1; /*no error*/
-return NULL;/*but is not a symbol*/
+  *error=1; /*no error*/
+  return NULL;/*but is not a symbol*/
 }
 /* .data 5,2,6,7*/
-int dataF(char *command,char * label,SWITCHER lableFlag)
+int dataF(char *command,char * label,SWITCHER lableFlag,int *dc,dataList **head)
 {
-  while (/* condition */) {
-    /* code */
+  int cummaCounter=0,i=0,data,currDc;;
+  char *cp;
+  currDc=*dc;
+  /*count commas to get how much numbers we have to insern*/
+  while (command[i]!='\0')
+  {
+    if (command[i]==',')
+    {
+    cummaCounter++;
+    if (command[i+1]==',') {
+        printf("error:double commas ");
+        return ERROR;
+    }
+  }
+    i++;
+  }
+  /*get the data to the Datalist*/
+  cp=strtok(command,",");
+  if (cummaCounter==0) {/*we have only one number*/
+    data=(int)strtol(cp,&cp,10);
+    i=0;
+		while(cp[i]==' '){i++;}
+		if(cp[i]!='\0')
+		{
+			printf("un prespectiv varible!! %c \n",cp[i]);
+			return ERROR;
+		}
+  }
+  for (; cummaCounter >0 ; cummaCounter--)
+  {
+    data=(int)strtol(cp,&cp,10);
+    /*test if cp is empty*/
+    while(cp[i]==' '){i++;}
+		if(cp[i]!='\0')
+		{
+			printf("un prespectiv varible!! %c \n",cp[i]);
+			return ERROR;
+		}
+    else
+    {
+    i
+    }
   }
   return 0;
 }
