@@ -104,7 +104,7 @@ char * issymbol(char *p,int *error)
   if(!(isalpha(p[i])&&p[i]!='.'))
   {
   printf("unligal word : %s \n",p);
-  *error=0;
+  *error=-1;
   return NULL;
   }
   while(p[i]!='\0')
@@ -116,13 +116,13 @@ char * issymbol(char *p,int *error)
           {
           i--;
           p[i]='\0';
-          *error=1;
+          *error=0;
           return p;/*is symbol!!!*/
         }
           else
           {
           printf("unligal word : %s \n",p);
-          *error=0;
+          *error=-1;
           return NULL;
           }
       }

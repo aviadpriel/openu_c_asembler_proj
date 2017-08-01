@@ -1,12 +1,11 @@
+#include "test.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #define ERROR -1
-typedef enum {ON,OFF,WHIT} SWITCHER;
 char * isSymbol(char *p,int *error);
 int isGuidelineStatement(char *p);
-void insertData(dataList **head,unsigned data);
 typedef struct commends
 {
 char *command;
@@ -116,7 +115,8 @@ char * isSymbol(char *p,int *error)
   return NULL;/*but is not a symbol*/
 }
 /* .data 5,2,6,7*/
-int dataF(char *command,char * label,SWITCHER lableFlag,int *dc,dataList **head)
+int dataF(char *command,char * label,SWITCHER lableFlag,int *dc,dataList **head
+,labelsTree **root)
 {
   int cummaCounter=0,i=0,data,currDc;;
   char *cp;
@@ -148,6 +148,7 @@ int dataF(char *command,char * label,SWITCHER lableFlag,int *dc,dataList **head)
   }
   for (; cummaCounter >0 ; cummaCounter--)
   {
+    cp=strtok(command,",");/*  5,2,-27,6*/
     data=(int)strtol(cp,&cp,10);
     /*test if cp is empty*/
     while(cp[i]==' '){i++;}
@@ -158,8 +159,47 @@ int dataF(char *command,char * label,SWITCHER lableFlag,int *dc,dataList **head)
 		}
     else
     {
-    i
+    insertData(head,data);
+    (*dc)++;
+    }
+  }
+  if (lableFlag == ON)
+  {
+    int num=insertLabel(root,label,OFF,OFF,currDc);
+    if(!num)
+    {
+      return ERROR;
+    }
+    else
+    {
+        return 0;
     }
   }
   return 0;
+}
+/*
+HELLO: .string "aviad"
+"aviad"
+*/
+int stringF(char *command,char * label,SWITCHER lableFlag,int *dc,dataList **head
+,labelsTree **root)
+{
+
+}
+int countrChars(char * word,char c)
+{
+  int counter,i;
+  i=0;
+  while (word[i]!='\0') {
+    if(word[i]==c)
+    {
+      counter++;
+      if(word[i+1]==c)
+      {
+        printf("error:duble %c is unligal!!\n",c);
+        return ERROR;
+      }
+    }
+  }
+  return counter;
 }

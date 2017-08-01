@@ -10,8 +10,8 @@ SWITCHER external;
 int address;
 struct labelsTree *ls, *rs;
 } labelsTree;
-typedef struct dataList {
-unsigned data:WORD_SIZE;
+typedef struct dataList{
+int data:WORD_SIZE;
 struct dataList *next;
 }dataList;
 dataList* newData(unsigned data);
@@ -20,16 +20,16 @@ dataList* newData(unsigned data);
 dataList* newData(unsigned data)
 {
   dataList *p = (dataList*)malloc(sizeof(dataList));
+  if(!p)
+  {
+    exit(0);
+  }
   p->data = data;
   p->next=NULL;
   return p;
 }
 
-/*
-put data in dataList
-return 1 if is work
-otherwise return -1
-*/
+
 void insertData(dataList **head,unsigned data)
 {
    dataList *current=(*head);
