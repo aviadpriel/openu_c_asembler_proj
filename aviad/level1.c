@@ -1,108 +1,134 @@
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <ctype.h>
-#define START_LINE 100 /*defualt start*/
-#define LINE_LEN 80 /*defualt line */
-int issymbol(char *p);
-typedef struct command
-      {
-      char *name;
-      void(*func)(char *command);
-      }cmd[]={
-             {"read_comp",read_comp},
-             {"print_comp",print_comp},
-             {"add_comp",add_comp},
-             {"sub_comp",sub_comp},
-             {"mult_comp_real",mult_comp_real},
-             {"mult_comp_img",mult_comp_img},
-             {"mult_comp_comp",mult_comp_comp},
-             {"abs_comp",abs_comp},
-       {"halt\n",halt},
-       {"error",NULL}};
-typedef struct symbol_tree {
-    char *symbol;
-    int address;
-    struct symbol_tree *ls, *rs;
-} symbol_tree;
-enum SYMBOL{TRUTH,FALSE};
-
+#include "headerfile.h"
 int main(int argc, char const *argv[]) {
-  FILE  *fp;
-  char *dataStorage[]={".data",".string",".mat"};
-  char line[LINE_LEN],*fild;
-  int address ,symbolFlag;
-  address =START_LINE;
+int dc=0,ic=100;
+FILE  *fp;
+symbol_tree *root=NULL;
+int symbolFlag;
+char line[LINE_LEN],*fild;
 fp=fopen(argv[1],"r");
-if (!fp) {
-  printf("cannot open the file : %s\n",argv[1]);
-  exit(1);
+if (!fp){
+ exit(1);
 }
 
 while (!(fgets(line,LINE_LEN,fp)))
 {
-  int i;
-  int flag;
-  fild=strtok(line,"");
-  if((flag=issymbol(fild))==1)/*is symbol*/
-  {
-    symbolFlag=TRUTH;
-  }
-  else if (flag==-1) {
-    /* code */
-  }
-  isdataStorage()
-}
-
-  return 0;
-}
-symbol_tree* newsymbol(char *symbol,int address) {
-    symbol_tree *p = (symbol_tree*)malloc(sizeof(symbol_tree));
-    p->symbol = symbol;
-    p->address=address;
-    p->ls = p->rs = NULL;
-    return p;
-}
-
-void insert(symbol_tree **root, char *symbol,int address) {
-/* insert using a loop and pointer to pointer*/
-    while(*root) {
-	if(strcmp(symbol,(*root)->symbol)<0)
-	    root = &( (*root)->ls);
-	else if(strcmp(symbol,(*root)->symbol)>0)
-	    root = &( (*root)->rs);
-  else/*error the symbol is in the list */
-  {
-  printf("the symbol %s is in the list in line %d \n",symbol,(*root)->address);
-  }
-    }
-    *root = newsymbol(symbol,address);
-}
-int issymbol(char *p)
+int i;
+int flag;
+char symbol[SYMBOLE_MAX_LEN];
+fild=strtok(line," ");
+if((flag=issymbol(fild))==1)/*is symbol*/
 {
-    int i=0;
-    if(!(isalpha(p[i])&&p[i]!='.'))
+  strncpy(symbol,fild,SYMBOLE_MAX_LEN);
+  symbolFlag=TRUTH;
+  fild=strtok(NULL," ");
+}
+else if (flag==-1) {
+  /* code */
+}
+for(i=0;cmd[i].func!=error;i++)
+          {
+              if(strcmp(fild,cmd[i].name)==0)
+                  break;
+          }
+              if(cmd[i].func==NULL)
+              {
+                  fprintf(stderr,"error:unligal commend ; %s\n",fild);
+              }
+              else
+                {
+                  if(symbolFlag==TRUTH)
+                  {
+                    if (i<3)
+                    {
+                      flag=insert(&root,symbol,DATA);
+                    }
+                    else if(i==4)
+                    {
+                      printf("warning:trying put a symbol before .entery function.\n");
+                    }
+                    else if(i==5) /*.entery wharnnig*/
+                    {
+                      printf("warning:trying put a symbol before .entery function.\n");
+                    }
+                    else if (i>5 && cmd[i].func!=error)
+                    {
+                    insert(&root,symbol,CODE);
+                    }
+                  }
+
+                  if(cmd[i].func==error)
+                  {
+                      printf("error: the commend %s is not found\n",fild );
+                  }
+                  else/*the commend is fine*/
+                  {
+                    fild = strtok(NULL,"\n");
+                    (*(cmd[i].func))(fild,i);
+                  }
+              }
+}
+
+return 0;
+}
+
+
+
+symbol_tree* newsymbol(char *symbol,int type) {
+  symbol_tree *p = (symbol_tree*)malloc(sizeof(symbol_tree));
+  p->symbol = symbol;
+  p->type=type;
+  p->ls = p->rs = NULL;
+  return p;
+}
+
+int insert(symbol_tree **root, char *symbol,int type) {
+/* insert using a loop and pointer to pointer*/
+  while(*root)
+  {
+     if(strcmp(symbol,(*root)->symbol)<0)
+       root = &( (*root)->ls);
+     else if(strcmp(symbol,(*root)->symbol)>0)
+       root = &( (*root)->rs);
+     else/*error the symbol is in the list */
     {
-    printf("unligal word : %s \n",p);
-    return -1;
+      printf("the symbol %s is in the list in line \n",symbol);
+      return 0;
     }
-    while(p[i]!='\0')
-    {
-        if(p[i]==':')
-        {
-            i++;
-            if(p[i]=='\0')
-            {
-                return 1;/*is symbol!!!*/
-            }
-            else
-            {
-            printf("unligal word : %s \n",p);
-            return -1;
-            }
+  }
+  *root = newsymbol(symbol,type);
+  return 1;
+}
+char * issymbol(char *p,int *error)
+{
+  int i=0;
+  if(!(isalpha(p[i])&&p[i]!='.'))
+  {
+  printf("unligal word : %s \n",p);
+  *error=0;
+  return NULL;
+  }
+  while(p[i]!='\0')
+  {
+      if(p[i]==':')
+      {
+          i++;
+          if(p[i]=='\0')
+          {
+          i--;
+          p[i]='\0';
+          *error=1;
+          return p;/*is symbol!!!*/
         }
-        else
-        i++;
-    }
-return 0;/*is not a symbol*/
+          else
+          {
+          printf("unligal word : %s \n",p);
+          *error=0;
+          return NULL;
+          }
+      }
+      else
+      i++;
+  }
+*error=1; /*no error*/
+return NULL;/*but is not a symbol*/
 }
