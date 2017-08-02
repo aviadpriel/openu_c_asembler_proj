@@ -1,5 +1,5 @@
-test.out:test.o
-	gcc -g -ansi -pedantic test.o -o test.out
+test.out:test2.o
+	gcc -g -ansi -pedantic test2.o -o test2.out
 
-test.o:test.c
-	gcc -g -ansi -pedantic -c test.c
+test2.o:test2.c
+	gcc -g -ansi -pedantic -c test2.c

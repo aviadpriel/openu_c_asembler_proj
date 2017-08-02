@@ -14,10 +14,10 @@ typedef struct dataList{
 int data:WORD_SIZE;
 struct dataList *next;
 }dataList;
-dataList* newData(unsigned data);
+dataList* newData(int data);
 
 /************dataList functions*******/
-dataList* newData(unsigned data)
+dataList* newData(int data)
 {
   dataList *p = (dataList*)malloc(sizeof(dataList));
   if(!p)
