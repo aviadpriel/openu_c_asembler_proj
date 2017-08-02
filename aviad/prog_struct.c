@@ -22,7 +22,8 @@ dataList* newData(int data)
   dataList *p = (dataList*)malloc(sizeof(dataList));
   if(!p)
   {
-    exit(0);
+    printf("mermory alloction error\n");
+    exit(1);
   }
   p->data = data;
   p->next=NULL;
@@ -30,7 +31,7 @@ dataList* newData(int data)
 }
 
 
-void insertData(dataList **head,unsigned data)
+void insertData(dataList **head,int data)
 {
    dataList *current=(*head);
   if(!(*head))
@@ -38,7 +39,7 @@ void insertData(dataList **head,unsigned data)
   (*head)=newData(data);
 
   }
-    else
+  else
     {
     while (current->next != NULL) {
         current = current->next;
@@ -76,7 +77,7 @@ int insertLabel(labelsTree **root, char *label,SWITCHER action,SWITCHER external
        root = &( (*root)->rs);
      else/*error the label is in the list */
     {
-      printf("the label %s is in the list in line \n",label);
+      printf("the label %s is in the list \n",label);
       return 0;
     }
   }
