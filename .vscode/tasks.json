@@ -1,0 +1,12 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "taskName": "makefile",
+            "command": "gcc -g -ansi -pedantic -Wall assembler.c",
+            "type": "shell"
+        }
+    ]
+}
