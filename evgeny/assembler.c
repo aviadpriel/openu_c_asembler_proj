@@ -33,10 +33,10 @@ int main ( int argc, char *argv[] )
         else /*begin the 2 stage processing*/
         {
             while(fgets( buff, LINE_LENGTH, (FILE*)file ))
-            first_run(buff);
+                first_run(buff);
             rewind(file);
             while(fgets( buff, LINE_LENGTH, (FILE*)file ))
-            second_run(buff);
+                second_run(buff);
             if(!ERROR)
             {
                 //free and clear all data without creating any file
