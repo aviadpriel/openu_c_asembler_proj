@@ -34,6 +34,7 @@ int main ( int argc, char *argv[] )
         {
             while(fgets( buff, LINE_LENGTH, (FILE*)file ))
             first_run(buff);
+            rewind(file);
             while(fgets( buff, LINE_LENGTH, (FILE*)file ))
             second_run(buff);
             if(!ERROR)
