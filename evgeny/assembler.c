@@ -9,11 +9,11 @@ second_run(char []buff);
 	*Function: int main(...)
 	*Input: file_name.as
 	*Return: 0 on success
-	*Description: read assembly file and decodes it to machine language and outputs 3 organized file_name.ob/ent/ext in a "strange 4-base" display. 
+	*Description: read assembly file and decodes it to machine language, Outputs 3 organized file_name.ob/ent/ext in a "strange 4-base" display. 
 *****************************************************************************************************************************************************/
 int main ( int argc, char *argv[] )
 {   
-    char buff[LINE_LENGTH];
+    char buff[LINE_LENGTH];//לבדוק אם הוראה לקובץ יחיד או שניתן להכניס יותר - בסרטון של דני דובר על 2 קבצים יחד בשורת פקודה.
     if ( argc != 2 ) /* argc should be 2 for correct execution */
     {
         /* We print argv[0] assuming it is the program name */
