@@ -36,6 +36,7 @@ int main ( int argc, char *argv[] )//לבדוק אם הוראה לקובץ יח�
             {
                 //free and clear functions without creating any file
                 fclose(file);
+                exit(1);
             }
             rewind(file);
             second_run(file, &dc, &ic);
@@ -43,6 +44,7 @@ int main ( int argc, char *argv[] )//לבדוק אם הוראה לקובץ יח�
             {
                 //free and clear functions without creating any file
                 fclose(file);
+                exit(1);
             }   
             //create the needed files and free and clear data.
         }
