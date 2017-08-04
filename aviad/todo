@@ -1,3 +1,13 @@
-int isdirective(char *command);
-int isAction(char *command);
-int isLabel(char *command);
+function from 3/8/15
+int isdirective(char *command); check
+int isAction(char *command); check
+int isLabel(char *command);check check 
+*********************************************
+
+pasdocode for first_run(char []line);
+
+int first_run(char line[])
+{
+    
+    char *buff=strtok(line)
+}

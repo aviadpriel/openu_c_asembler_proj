@@ -2,7 +2,7 @@
 #include <stdio.h>
 #include <string.h>
 #define WORD_SIZE 10
-typedef enum {ON,OFF,WHIT} SWITCHER;
+typedef enum {ON,OFF,WAIT} SWITCHER;
 typedef struct labelsTree {
   char *label;
 SWITCHER action;

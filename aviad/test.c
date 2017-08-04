@@ -21,18 +21,11 @@ int isGuidelineStatement(char *p)
   }
   return -2;
 }
-char * isLabel(char *p,int *error)
+char * isLabel(char *buf,int *error)
 {
   int i;
-  while (isspace(*p)) {
-  p++;
-  }
-  if(!(isalpha(*p)&&*p!='.'))
-  {
-    printf("unligal word : %s \n",p);
-    *error=-1;
-    return NULL;
-  }
+  while (isspace(*buf)) {buf++;}
+  
   while(p[i]!='\0')
   {
     if(p[i]==':')
