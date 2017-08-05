@@ -5,11 +5,11 @@
 #define ERROR -1
 #define LINE_LENGTH 81
 typedef enum {ON,OFF,WHIT} SWITCHER;
+/*evgeny : Declaration of functions that must be written (in another file)*/
 int isDirective(char *command);
 int isAction(char *command);
 int isRegister(char *buf);
 char * isLabel(char * buf,int *error);
-/*evgeny : Declaration of functions that must be written (in another file)*/
 
 /*
 for active functions
