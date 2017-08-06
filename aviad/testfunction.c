@@ -8,7 +8,7 @@
 int countrChars(char *word, char c);
 char *isSymbol(char *p, int *error);
 /*get numbers from comma list like 2,3,6,4,8,9*/
-int commaList(dataList **head, char *command, int cummaCounter, int *dc);
+int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc);
 int isGuidelineStatement(char *p);
 typedef struct commends
 {
@@ -57,7 +57,7 @@ void guidelineStatement(char *commend, int commandIndex, int dc)
 }
 
 /* .data 5,2,6,7*/
-int dataF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **head, labelsTree **root)
+int dataF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **dataHead, labelsTree **labelsHead)
 {
   int cummaCounter = 0, i = 0, currDc;
   currDc = *dc;
@@ -76,11 +76,11 @@ int dataF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **he
     i++;
   }
 
-  if ((commaList(head, command, cummaCounter, dc)) == ERROR)
+  if ((commaList(dataHead, command, cummaCounter, dc)) == ERROR)
     return ERROR;
   if (lableFlag == ON)
   {
-    int num = addLabel(root, label, OFF, OFF, currDc);
+    int num = addLabel(labelsHead, label, OFF, OFF, currDc);
     if (!num)
     {
       return ERROR;
@@ -96,7 +96,7 @@ int dataF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **he
   HELLO: .string "aviad"
   "aviad"
   */
-int stringF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **head, labelsTree **root)
+int stringF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **dataHead, labelsTree **labelsHead)
 {
   int currDc = *dc, i;
   int countr = countrChars(command, '\"');
@@ -124,12 +124,12 @@ int stringF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **
 
       }
       */
-    insertData(head, data);
+    insertData(dataHead, data);
     (*dc)++;
     i++;
   }
   /*add a 0 in the and if the string*/
-  insertData(head, 0);
+  insertData(dataHead, 0);
   (*dc)++;
   /*Check with the rest of the line without characters*/
   i++;
@@ -147,7 +147,7 @@ int stringF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **
   /*add label if exzist one */
   if (lableFlag == ON)
   {
-    int num = addLabel(root, label, OFF, OFF, currDc);
+    int num = addLabel(labelsHead, label, OFF, OFF, currDc);
     if (!num)
     {
       return ERROR;
@@ -160,7 +160,7 @@ int stringF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **
   return 0;
 }
 
-int matF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **head, labelsTree **root)
+int matF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **dataHead, labelsList **labelsHead)
 {
 
   int currDc = *dc, counter, matRow, matColum, matLen,diff;
@@ -233,13 +233,13 @@ int matF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **hea
   {
     for (; matLen > 0; matLen--)
     {
-      insertData(head, 0);
+      insertData(dataHead, 0);
       (*dc)++;
     }
   }
   else
   {
-    if ((commaList(head, command, counter, dc)) == ERROR)
+    if ((commaList(dataHead, command, counter, dc)) == ERROR)
       return ERROR;
   }
     if(matLen>(counter+1))
@@ -247,7 +247,7 @@ int matF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **hea
     diff = matLen-(counter+1);
     for (; diff > 0; diff--)
     {
-      insertData(head, 0);
+      insertData(dataHead, 0);
       (*dc)++;
     }
     }  
@@ -255,7 +255,7 @@ int matF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **hea
   /*add label if exzist one */
   if (lableFlag == ON)
   {
-    int num = addLabel(root, label, OFF, OFF, currDc);
+    int num = addLabel(labelsHead, label, OFF, OFF, currDc);
     if (!num)
     {
       return ERROR;
@@ -287,7 +287,7 @@ int countrChars(char *word, char c)
   } /*end of while*/
   return counter;
 }
-int commaList(dataList **head, char *command, int cummaCounter, int *dc)
+int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc)
 {
   char *cp;
   int data;
@@ -321,7 +321,7 @@ int commaList(dataList **head, char *command, int cummaCounter, int *dc)
     }
     else
     {
-      insertData(head, data);
+      insertData(dataHead, data);
       (*dc)++;
     }
     cp = strtok(NULL, ",");

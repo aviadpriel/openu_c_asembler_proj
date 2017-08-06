@@ -33,12 +33,12 @@ dataList* newData(int data)
 }
 
 
-void insertData(dataList **head,int data)
+void insertData(dataList **dataHead,int data)
 {
-   dataList *current=(*head);
-  if(!(*head))
+   dataList *current=(*dataHead);
+  if(!(*dataHead))
   {
-  (*head)=newData(data);
+  (*dataHead)=newData(data);
 
   }
   else
