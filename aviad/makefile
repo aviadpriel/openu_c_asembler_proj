@@ -1,5 +1,14 @@
-test.out:test2.o
-	gcc -g -ansi -pedantic test2.o -o test2.out
+main.out:main.o isSomsing.o testfunction.o prog_struct.o
+	gcc -g -ansi -Wall -pedantic main.o isSomsing.o testfunction.o prog_struct.o -o main.out
 
-test2.o:test2.c
-	gcc -g -ansi -pedantic -c test2.c
+isSomsing.o:isSomsing.c
+	gcc -g -ansi -Wall -pedantic -c isSomsing.c
+
+testfunction.o:testfunction.c
+	gcc -g -ansi -Wall -pedantic -c testfunction.c
+
+prog_struct.o:prog_struct.c
+	gcc -g -ansi -Wall -pedantic -c prog_struct.c
+
+	main.o:main.c,main.h
+	gcc -g -ansi -Wall -pedantic -c main.h main.c

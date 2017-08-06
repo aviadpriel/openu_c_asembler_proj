@@ -2,14 +2,16 @@
 #include <stdio.h>
 #include <string.h>
 #define WORD_SIZE 10
+#define ERROR -1
+
 typedef enum {ON,OFF,WAIT} SWITCHER;
-typedef struct labelsTree {
+typedef struct labelsList {
   char *label;
 SWITCHER action;
 SWITCHER external;
 int address;
-struct labelsTree *ls, *rs;
-} labelsTree;
+struct labelsList *next;
+} labelsList;
 typedef struct dataList{
 int data:WORD_SIZE;
 struct dataList *next;
@@ -49,10 +51,10 @@ void insertData(dataList **head,int data)
 }
 
 
-/************labelsTree functions*******/
-labelsTree* newLabel(char *label,int address,SWITCHER action,SWITCHER external)
+/************labelsList functions*******/
+labelsList* newLabel(char *label,int address,SWITCHER action,SWITCHER external)
 {
-  labelsTree *p = (labelsTree*)malloc(sizeof(labelsTree));
+  labelsList *p = (labelsList*)malloc(sizeof(labelsList));
   if (!p) {
     printf("memmory error exit\n");
     exit(1);
@@ -61,24 +63,22 @@ labelsTree* newLabel(char *label,int address,SWITCHER action,SWITCHER external)
   p->action=action;
   p->external=external;
   p->address=address;
-  p->ls = p->rs = NULL;
+  p->next =NULL;
   return p;
 }
 /*if */
-int insertLabel(labelsTree **root, char *label,SWITCHER action,SWITCHER external,
+int addLabel(labelsList **root, char *label,SWITCHER action,SWITCHER external,
   int address)
 {
 /* insert using a loop and pointer to pointer*/
   while(*root)
   {
-     if(strcmp(label,(*root)->label)<0)
-       root = &( (*root)->ls);
-     else if(strcmp(label,(*root)->label)>0)
-       root = &( (*root)->rs);
+     if(strcmp(label,(*root)->label)!=0)
+       root = &( (*root)->next);
      else/*error the label is in the list */
     {
       printf("the label %s is in the list \n",label);
-      return 0;
+      return ERROR;
     }
   }
   *root = newLabel(label,address,action,external);
