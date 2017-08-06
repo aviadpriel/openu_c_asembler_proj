@@ -6,7 +6,6 @@
 
 #define ERROR -1
 int countrChars(char *word, char c);
-char *isSymbol(char *p, int *error);
 /*get numbers from comma list like 2,3,6,4,8,9*/
 int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc);
 int isGuidelineStatement(char *p);
@@ -57,7 +56,7 @@ void guidelineStatement(char *commend, int commandIndex, int dc)
 }
 
 /* .data 5,2,6,7*/
-int dataF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **dataHead, labelsTree **labelsHead)
+int dataF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **dataHead, labelsList **labelsHead)
 {
   int cummaCounter = 0, i = 0, currDc;
   currDc = *dc;
@@ -96,7 +95,7 @@ int dataF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **da
   HELLO: .string "aviad"
   "aviad"
   */
-int stringF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **dataHead, labelsTree **labelsHead)
+int stringF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **dataHead, labelsList **labelsHead)
 {
   int currDc = *dc, i;
   int countr = countrChars(command, '\"');

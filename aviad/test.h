@@ -1,18 +1,18 @@
 
 #define WORD_SIZE 10
 typedef enum {ON,OFF,WHIT} SWITCHER;
-typedef struct labelsTree {
+typedef struct labelsList {
   char *label;
 SWITCHER action;
 SWITCHER external;
 int address;
-struct labelsTree *ls, *rs;
-} labelsTree;
+struct labelsList *next;
+} labelsList;
 typedef struct dataList{
 int data:WORD_SIZE;
 struct dataList *next;
 }dataList;
 void insertData(dataList **head,unsigned data);
-labelsTree* newLabel(char *label,int address,SWITCHER action,SWITCHER external);
-int insertLabel(labelsTree **root, char *label,SWITCHER action,SWITCHER external,
+labelsList* newLabel(char *label,int address,SWITCHER action,SWITCHER external);
+int addLabel(labelsList **root, char *label,SWITCHER action,SWITCHER external,
   int address);

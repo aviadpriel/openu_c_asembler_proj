@@ -67,20 +67,20 @@ labelsList* newLabel(char *label,int address,SWITCHER action,SWITCHER external)
   return p;
 }
 /*if */
-int addLabel(labelsList **root, char *label,SWITCHER action,SWITCHER external,
+int addLabel(labelsList **labelsHead, char *label,SWITCHER action,SWITCHER external,
   int address)
 {
 /* insert using a loop and pointer to pointer*/
-  while(*root)
+  while(*labelsHead)
   {
-     if(strcmp(label,(*root)->label)!=0)
-       root = &( (*root)->next);
+     if(strcmp(label,(*labelsHead)->label)!=0)
+       labelsHead = &( (*labelsHead)->next);
      else/*error the label is in the list */
     {
       printf("the label %s is in the list \n",label);
       return ERROR;
     }
   }
-  *root = newLabel(label,address,action,external);
+  *labelsHead = newLabel(label,address,action,external);
   return 1;
 }
