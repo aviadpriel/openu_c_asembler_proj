@@ -3,10 +3,13 @@
 #include <string.h>
 #define WORD_SIZE 10
 #define ERROR -1
+#define LABEL_MAX_LEN 30
+
 
 typedef enum {ON,OFF,WAIT} SWITCHER;
 typedef struct labelsList {
   char *label;
+SWITCHER data;  
 SWITCHER action;
 SWITCHER external;
 int address;
@@ -16,6 +19,12 @@ typedef struct dataList{
 int data:WORD_SIZE;
 struct dataList *next;
 }dataList;
+typedef struct commandList{
+char *name;  
+int operends;
+int operendGroup;
+}commandList;
+
 dataList* newData(int data);
 
 /************dataList functions*******/
@@ -52,23 +61,25 @@ void insertData(dataList **dataHead,int data)
 
 
 /************labelsList functions*******/
-labelsList* newLabel(char *label,int address,SWITCHER action,SWITCHER external)
+labelsList* newLabel(char *label,int address,SWITCHER action,SWITCHER external,SWITCHER data)
 {
   labelsList *p = (labelsList*)malloc(sizeof(labelsList));
   if (!p) {
     printf("memmory error exit\n");
     exit(1);
   }
-  p->label = label;
+  p->label=(char *)malloc(sizeof(char)*LABEL_MAX_LEN);
+  strncpy(p->label,label,LABEL_MAX_LEN);
   p->action=action;
   p->external=external;
   p->address=address;
+  p->data=data;
   p->next =NULL;
   return p;
 }
-/*if */
+
 int addLabel(labelsList **labelsHead, char *label,SWITCHER action,SWITCHER external,
-  int address)
+  SWITCHER data,int address,int line)
 {
 /* insert using a loop and pointer to pointer*/
   while(*labelsHead)
@@ -77,10 +88,10 @@ int addLabel(labelsList **labelsHead, char *label,SWITCHER action,SWITCHER exter
        labelsHead = &( (*labelsHead)->next);
      else/*error the label is in the list */
     {
-      printf("the label %s is in the list \n",label);
+      printf("Error: line %d:the label %s is in the list \n",line,label);
       return ERROR;
     }
   }
-  *labelsHead = newLabel(label,address,action,external);
+  *labelsHead = newLabel(label,address,action,external,data);
   return 1;
 }

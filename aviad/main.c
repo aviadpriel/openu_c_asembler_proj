@@ -1,15 +1,20 @@
-#include "main.h"
-int matF(char *command,char * label,SWITCHER lableFlag,int *dc,dataList **dataHead
-    ,labelsList **labelsHead);
-int isRegister(char *buf);
+#include "struct.h"
+int first_run(FILE *fp,labelsList **labelsHead,dataList **dataHead,int *dc,int *ic);
 int main()
 {
-dataList *dataHead =NULL;
-labelsList *labelsHead=NULL; 
-int dc =0;   
-dc=0;
-char c[]={" [2][3] 0,1,2,3   \0"}; 
+labelsList *labelsHead=NULL;
+dataList *dataHead=NULL;
+int ic=100,dc=0,rval=0;
+FILE *fp;
+fp=fopen("test.as","r");
+if(!fp)
+{
+printf("cannot open file!! \n");
+exit(1);
+}
 
-printf("%d ! \n",matF(c,"aviad",ON,&dc,&dataHead,&labelsHead));
+
+rval=first_run(fp,&labelsHead,&dataHead,&dc,&ic); 
+printf("ic is :%d \n dc is :%d \n rval is :%d \n",ic,dc,rval);   
 return 0;
 }

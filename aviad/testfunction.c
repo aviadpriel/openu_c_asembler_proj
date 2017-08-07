@@ -3,60 +3,17 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-
+int isDirectiveAddressing(char * buff,int line);/*from isSome.c*/
 #define ERROR -1
-int countrChars(char *word, char c);
+int countrChars(char *word, char c,int line);
 /*get numbers from comma list like 2,3,6,4,8,9*/
-int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc);
-int isGuidelineStatement(char *p);
+int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc,int line);
 typedef struct commends
 {
   char *command;
 } commends;
-/* HELLO: add r1,2
-sub r2,2
-.mat [2][2] 1,2,3,4
-.string "aviad"
-
-*/
-
-/*
-pasado code
-is label ? flag_on:flag_off;
-is guidelineStatement ?
-guidelineStatement(line,flag_on,label) or(line,flag_off,NULL):
-next
-*/
-int isGuidelineStatement(char *p)
-{
-  int i;
-  commends cmd[] = {{".data"}, {".string"}, {".mat"}, {".entry"}, {".extern"}};
-  for (i = 0; i < 5; i++)
-  {
-    if ((strcmp(cmd[i].command, p)) == 0)
-      return i;
-  }
-  return -2;
-}
-
-void guidelineStatement(char *commend, int commandIndex, int dc)
-{
-  switch (commandIndex)
-  {
-  case 0:
-  {
-  }
-  case 1:
-  {
-  }
-  case 2:
-  {
-  }
-  }
-}
-
 /* .data 5,2,6,7*/
-int dataF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **dataHead, labelsList **labelsHead)
+int dataF(char *command, char *label,int *dc, dataList **dataHead, labelsList **labelsHead,int line)
 {
   int cummaCounter = 0, i = 0, currDc;
   currDc = *dc;
@@ -68,18 +25,18 @@ int dataF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **da
       cummaCounter++;
       if (command[i + 1] == ',')
       {
-        printf("error:double commas ");
+        printf("error:line %d; double commas \n",line);
         return ERROR;
       }
     }
     i++;
   }
 
-  if ((commaList(dataHead, command, cummaCounter, dc)) == ERROR)
+  if ((commaList(dataHead, command, cummaCounter, dc,line)) == ERROR)
     return ERROR;
-  if (lableFlag == ON)
+  if (label)
   {
-    int num = addLabel(labelsHead, label, OFF, OFF, currDc);
+    int num = addLabel(labelsHead,label,OFF,OFF,ON,currDc,line);
     if (!num)
     {
       return ERROR;
@@ -95,10 +52,10 @@ int dataF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **da
   HELLO: .string "aviad"
   "aviad"
   */
-int stringF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **dataHead, labelsList **labelsHead)
+int stringF(char *command, char *label, int *dc, dataList **dataHead, labelsList **labelsHead,int line)
 {
   int currDc = *dc, i;
-  int countr = countrChars(command, '\"');
+  int countr = countrChars(command, '\"',line);
   int data;
   if (countr != 2)
   {
@@ -109,7 +66,7 @@ int stringF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **
   {
     if (!isspace(command[i]))
     {
-      printf("error in format of .string \"somestring\"  %s\n", command);
+      printf("error:line %d: in format of .string \"somestring\"  %s\n",line,command);
       return ERROR;
     }
     i++;
@@ -117,12 +74,6 @@ int stringF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **
   i++; /*for pass the " char*/
   while ((data = command[i]) != '\"')
   {
-    /*
-        if(!isalnum(data)&&(!isspace(data)))
-        {
-
-      }
-      */
     insertData(dataHead, data);
     (*dc)++;
     i++;
@@ -136,7 +87,7 @@ int stringF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **
   {
     if (!isspace(command[i]))
     {
-      printf("error in format of .string \"somestring\"  %s\n", command);
+      printf("error:line %d: in format of .string \"somestring\"  %s\n",line,command);
       return ERROR;
     }
     i++;
@@ -144,9 +95,9 @@ int stringF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **
   /*and Check... */
 
   /*add label if exzist one */
-  if (lableFlag == ON)
+  if (label)
   {
-    int num = addLabel(labelsHead, label, OFF, OFF, currDc);
+    int num = addLabel(labelsHead, label, OFF, OFF,ON,currDc,line);
     if (!num)
     {
       return ERROR;
@@ -159,70 +110,92 @@ int stringF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **
   return 0;
 }
 
-int matF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **dataHead, labelsList **labelsHead)
+int matF(char *buff,char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line)
 {
 
   int currDc = *dc, counter, matRow, matColum, matLen,diff;
-  counter = countrChars(command, '[');
-  if (counter != 2)
-  {
-    printf("error: in  .mat [num1][num2] format: .mat \n");
-    return ERROR;
-  }
-  counter = countrChars(command, ']');
-  if (counter != 2)
-  {
-    printf("error: in .mat [num1][num2] format: .mat \n");
-    return ERROR;
-  }
-
-  while (*command != '[')
-  {
-    if (!isspace(*command))
+  char openBracket='[',closeBracket=']';
+int openCunter=0,closeCunter=0,i=0;
+while(buff[i]!='\0')
+{
+    if(buff[i]==openBracket)
     {
-      printf("error: in .mat [num1][num2] format: .mat n");
+        openCunter++;
+        if(openCunter==2 &&closeCunter==0)
+        {
+            return ERROR;
+        } 
+    }else if(buff[i]==closeBracket)
+    {
+        closeCunter++;
+        if(closeCunter>openCunter)
+        {
+            return 0;
+        } 
+    }
+    i++;
+}
+if(closeCunter!=2 ||openCunter !=2)
+{
+ return ERROR;
+}
+
+  while (*buff != '[')
+  {
+    if (!isspace(*buff))
+    {
+      printf("error:line %d: in .mat [num1][num2] format: .mat n",line);
       return ERROR;
     }
-    command++;
+    buff++;
   }
   /*We will examine the first casings*/
-  command++;
-  matRow = (int)strtol(command, &command, 10);
-  while (*command != ']')
+  buff++;
+  matRow = (int)strtol(buff, &buff, 10);
+  while (*buff != ']')
   {
-    if (!isspace(*command))
+    if (!isspace(*buff))
     {
-      printf("error: in .mat [num1][num2] format: .mat \n");
+      printf("error:line %d: in .mat [num1][num2] format: .mat n",line);
       return ERROR;
     }
-    command++;
+    buff++;
   }
-  command++;
-  if (*command != '[')
+  buff++;
+   while (*buff != '['&&buff!=NULL)
   {
-    printf("error: in .mat [num1][num2] format: .mat \n");
+    if (!isspace(*buff))
+    {
+      printf("error:line %d: in .mat [num1][num2] format: .mat n",line);
+      return ERROR;
+    }
+    buff++;
+  }
+  if (*buff != '[')
+  {
+      printf("error:line %d: in .mat [num1][num2] format: .mat n",line);
     return ERROR;
   }
-    command++;
-  matColum = (int)strtol(command, &command, 10);
-  while (*command != ']')
+    buff++;
+  matColum = (int)strtol(buff, &buff, 10);
+  while (*buff != ']')
   {
-    if (!isspace(*command))
+    if (!isspace(*buff))
     {
-      printf("errsor: in .mat [num1][num2] format: .mat \n");
+      printf("error:line %d: in .mat [num1][num2] format: .mat n",line);
       return ERROR;
     }
-    command++;
+    buff++;
   }
-   command++;
-  counter = countrChars(command, ',');
+   buff++;
+  counter = countrChars(buff, ',',line);
   if (counter == ERROR)
     return ERROR;
 
   matLen = matColum * matRow;
   if (!matLen)
   {
-    printf("error: in .mat [num1][num2] format:\n");
+    printf("error:line %d: in .mat [num1][num2] format: .mat n",line);
     printf("num1 and num2 Must be greater than 0 n");
     return ERROR;
   }
@@ -238,7 +211,7 @@ int matF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **dat
   }
   else
   {
-    if ((commaList(dataHead, command, counter, dc)) == ERROR)
+    if ((commaList(dataHead, buff, counter, dc,line)) == ERROR)
       return ERROR;
   }
     if(matLen>(counter+1))
@@ -252,9 +225,9 @@ int matF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **dat
     }  
 
   /*add label if exzist one */
-  if (lableFlag == ON)
+  if (label)
   {
-    int num = addLabel(labelsHead, label, OFF, OFF, currDc);
+    int num = addLabel(labelsHead, label, OFF, OFF,ON,currDc,line);
     if (!num)
     {
       return ERROR;
@@ -266,27 +239,98 @@ int matF(char *command, char *label, SWITCHER lableFlag, int *dc, dataList **dat
   }
   return 0;
 } /*end of matF function*/
+int externF(char *buff,char *label,labelsList **labelsHead,int line)
+{
+  int cunter=countrChars(buff,',',line);
+   if(label)
+          {
+            printf("warnning:line %d:no need lable for .extern function.\n",line);
+          }
+  if(cunter == ERROR)
+    {
+      return ERROR;
+    } 
 
-int countrChars(char *word, char c)
+    if(cunter == 0)
+    {
+      if(isDirectiveAddressing(buff,line)==1)
+      {
+        addLabel(labelsHead,buff,WAIT,ON,WAIT,0,line);
+      }else
+        {
+          printf("error:line %d: unvalid label for extern function !!\n",line);
+          return ERROR;
+        }
+    }else
+    {
+      char *tok;
+      tok=strtok(buff,",");
+      for(;cunter>=0;cunter--)
+    {
+      if(!tok)
+      {
+        printf("error:line %d: un use comma in the end of the line\n",line);
+        return ERROR;
+      }
+      else 
+      {
+        int i=0;
+        while(isspace(tok[i])&&tok[i]!='\0'){i++;}
+        if(tok[i]=='\0')
+        {
+          printf("error:line %d: no data between the commas \n ",line);
+          return ERROR;
+        }
+      }
+       if(isDirectiveAddressing(tok,line)!=1)
+      {
+        addLabel(labelsHead,tok,WAIT,ON,WAIT,0,line);
+      }else
+        {
+          printf("error:line %d: unvalid label for extern function !!\n",line);
+          return ERROR;
+        }
+     tok=strtok(NULL,","); 
+    }
+    return 0;
+    }
+        return 0;
+}
+int entryF(char * buff,char *label,int line)
+{
+    if(label)
+          {
+            printf("warnning:line %d:no need lable for .entry function.\n",line);
+          }
+ if(isDirectiveAddressing(buff,line)!=1)
+ {
+   printf("error:line %d:unlial label  %s\n",line,buff);
+   return ERROR;
+ }
+ 
+ return 0;
+}
+ int countrChars(char *word, char c,int line)
 {
   int counter = 0;
-  while (*word != '\0')
+  int i=0;
+  while (word[i] != '\0')
   {
-    if (*word == c)
+    if (word[i] == c)
     {
-      word++;
+      i++;
       counter++;
-      if (*word == c)
+      if (word[i] == c)
       {
-        printf("error:duble %c is unligal!!\n", c);
+        printf("error:line %d: double %c is unligal!!\n",line,c);
         return ERROR;
       }
     }
-    word++;
+    i++;
   } /*end of while*/
   return counter;
 }
-int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc)
+int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc,int line)
 {
   char *cp;
   int data;
@@ -301,12 +345,32 @@ int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc)
     }
     if (*cp != '\0')
     {
-      printf("un prespectiv varible!! %c \n", *cp);
+      printf("error:line %d: un prespectiv varible!! %c \n",line,*cp);
       return ERROR;
+    }else{
+        insertData(dataHead, data);
+      *dc+=1;
+      return 0;
     }
+    
   }
   for (; cummaCounter >= 0; cummaCounter--)
   {
+    if(!cp)
+    {
+      printf("i found the bug\n");
+      exit(1);
+    }else 
+    {
+      int i=0;
+      while(isspace(cp[i])&&cp[i]!='\0'){i++;}
+      if(cp[i]=='\0')
+      {
+        printf("error:line %d: no data between two commas \n ",line);
+        return ERROR;
+      }
+
+    }
     data = (int)strtol(cp, &cp, 10);
     /*test if cp is empty*/
     while (*cp == ' ')
@@ -315,13 +379,13 @@ int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc)
     }
     if (*cp != '\0')
     {
-      printf("un prespectiv varible!! %c \n", *cp);
+      printf("error:line %d: un prespectiv varible!! %c \n",line,*cp);
       return ERROR;
     }
     else
     {
       insertData(dataHead, data);
-      (*dc)++;
+      *dc+=1;
     }
     cp = strtok(NULL, ",");
   }
