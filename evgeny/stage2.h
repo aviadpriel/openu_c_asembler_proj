@@ -12,6 +12,10 @@ what to include inside wrapper?
 #include "general.h"
 #include "errors.h"
 
-second_run(file);
+
+int is_label(char *field, labelList *head, labelList curr);
+int is_directing(char *field, char *label);
+stage2(FILE *file, data *data_head, lableList *label_head,codeList *code_head);
+
 
 #endif/*end of STAGE2_H*/
