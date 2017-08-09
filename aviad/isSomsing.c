@@ -5,13 +5,18 @@
 #define ERROR -1
 #define LABEL_MAX_LEN 30
 #define COMMENT_FLAG ';'
+/*פונקציות עזר*/
+ int isEmpty(char * buff);
 int countrChars(char *word,char c,int line);
+/*          */
+/*מבנה נתונים לאחסון הפונקציות*/
 typedef struct commandList{
 char *name;  
 int operends;
 int firstOperendGroup;
 int secondOperendGroup;
 }commandList;
+/*לזיהוי סוג המיעון*/
 typedef enum {EMPTY=-1,IMMEDIATELY=0,DIRECT=1,MATRIX=2,REG_DIRECT=3} addressing_method;
 static commandList _action[]={{"mov",2,4,3},
 				{"cmp",2,4,4},
@@ -30,12 +35,12 @@ static commandList _action[]={{"mov",2,4,3},
 				{"rts",0,0,0},
 				{"stop",0,0,0},
 				{NULL,0,0,0}};
-/*whte we have in this file
-isDirective -work
-isAction -work
-isRegister -work
-isLabel - need more tests
-*/
+static commandList _directive[]={
+           {".data"},
+           {".string"},
+           {".mat"},
+           {".entry"},
+           {".extern"}};
 typedef enum {ON,OFF,WAIT} SWITCHER;
 typedef struct stringArry
     {
@@ -61,22 +66,21 @@ int isDirective(char *command)
 {
     int functionLen;
     int i=0;
-    stringArry cmd[]={
-           {".data"},
-           {".string"},
-           {".mat"},
-           {".entry"},
-           {".extern"}};
  /*skip spaces and tabs*/   
 while(isspace(*command)){command++;}
+/*for the case .mat[][] */
 while(!isspace(command[i])&&command[i]!='\0'&&command[i]!='['){i++;}
 functionLen = i;
 for(i=0;i<5;i++)
 {
-    if(strncmp(cmd[i].string,command,functionLen)==0)
+    if(strncmp(_directive[i].name,command,functionLen)==0)
     {
-        if((strlen(cmd[i].string))==(functionLen)) 
+        if((strlen(_directive[i].name))==(functionLen)) 
             return i;
+        else 
+            {
+
+            }
     }
 }
     return -2;
@@ -478,6 +482,11 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         secondOp=EMPTY;
         /*calculet the first operend*/
         tok=strtok(buff,",");
+        if(!isEmpty(tok))
+        {
+            printf("ERROR:line %d: miseeng a first operend \n",line);
+            return ERROR;
+        }
         rval=isImmediateAddressing(tok,line);
         if(rval == ERROR)
         {
@@ -505,11 +514,16 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         }
         if(firstOp==EMPTY)
         {
-            printf("ERROR:line %d: unvalid addressing method ",line);
+            printf("ERROR:line %d: unvalid addressing method \n",line);
             return ERROR;
         }
         /*calculet the second operend*/
          tok=strtok(NULL,"\0");
+         if(!tok)
+        {
+            printf("ERROR:line %d: miseeng a second operend \n",line);
+            return ERROR;
+        }
         rval=isImmediateAddressing(tok,line);
         if(rval == ERROR)
         {
@@ -613,4 +627,17 @@ if(_action[functionIndex].operends==0)/*if no operends*/
     }
     return ERROR;
 }
- 
+ int isEmpty(char * buff)
+ {
+    int i=0;
+    if(!buff)
+    {
+        return 0;
+    }
+     while(buff&&isspace(buff[i])){i++;}
+     if(!buff)
+     {
+         return 0;
+     }
+     return -2;
+ }
