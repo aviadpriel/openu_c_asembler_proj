@@ -96,7 +96,7 @@ if(!line)
         }
         case 3:/*.entry function*/
         {
-          if(entryF(char * buff,char *label,int lineCounter)==ERROR)
+          if(entryF(buff,label,lineCounter)==ERROR)
           {errorFlag=ON;}
                     break;
         }

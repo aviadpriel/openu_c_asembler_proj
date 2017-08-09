@@ -199,19 +199,26 @@ if(closeCunter!=2 ||openCunter !=2)
     printf("num1 and num2 Must be greater than 0 n");
     return ERROR;
   }
+  
   /*if No entries have been entered, we will save a space in datalist*/
-
+/* TODO add test for chack if we have one variable*/
   if (counter == 0)
   {
+    
     for (; matLen > 0; matLen--)
     {
       insertData(dataHead, 0);
       (*dc)++;
     }
   }
+  else if(counter>=matLen)
+  {
+  printf(" error:line %d too many arguments to function .mat \n",line);
+  return ERROR;
+  }
   else
   {
-    if ((commaList(dataHead, buff, counter, dc,line)) == ERROR)
+    if (commaList(dataHead, buff, counter, dc,line) == ERROR)
       return ERROR;
   }
     if(matLen>(counter+1))
@@ -298,17 +305,22 @@ int externF(char *buff,char *label,labelsList **labelsHead,int line)
 }
 int entryF(char * buff,char *label,int line)
 {
+  int rval;
     if(label)
           {
             printf("warnning:line %d:no need lable for .entry function.\n",line);
           }
- if(isDirectiveAddressing(buff,line)!=1)
+ if((rval=isDirectiveAddressing(buff,line))==ERROR)
  {
-   printf("error:line %d:unlial label  %s\n",line,buff);
-   return ERROR;
+  return ERROR;
  }
- 
- return 0;
+ else if(rval ==1)
+ {
+ return 1;
+ }
+ /*rval = 0*/
+ printf("error : line %d: unligal label!!\n",line);
+ return ERROR;
 }
  int countrChars(char *word, char c,int line)
 {

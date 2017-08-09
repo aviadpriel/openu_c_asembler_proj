@@ -9,5 +9,5 @@ LOOP:   jmp END
 END:    stop
 STR:    .string "abcdef"
 K:      .data   22,23,105,1,2,3,43
-M1:     .mat  [2][2]  1,5,4
-AVI:        .extern AVIAD
+M1:     .mat  [2][2]  1
+        .ex END

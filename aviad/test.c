@@ -3,63 +3,25 @@
 #include<stdlib.h>
 #include<string.h>
 #define ERROR -1
-#define WORD_SIZE 10
+#define LINE_LEN 81
+#define BUFF_LEN 100
 typedef enum {ON,OFF,WHIT} SWITCHER;
-typedef struct commends
+int main()
 {
-  char *command;
-}commends;
-
-int isGuidelineStatement(char *p)
+FILE *fp;
+char * buff;
+buff=(char *)malloc(sizeof(char)*BUFF_LEN);
+fp=fopen("test.t","r");
+if(!fp)
 {
-  int i;
-  commends cmd[]={".data",".string",".mat",".entry",".extern"};
-  for(i=0;i<5;i++)
-  {
-    if ((strcmp(cmd[i].command,p))==0)
-    return i;
-  }
-  return -2;
+  exit(1);
 }
-char * isLabel(char *buf,int *error)
+while(fgets( buff, BUFF_LEN,fp))
 {
-  int i;
-  while (isspace(*buf)) {buf++;}
-  
-  while(p[i]!='\0')
+  if(strlen(buff)>=LINE_LEN)
   {
-    if(p[i]==':')
-    {
-      i++;
-      if(p[i]=='\0')
-      {
-        i--;
-        p[i]='\0';
-        if (!isAction(p)&&!isGuidelineStatement(p)) {
-          /* code */
-        }
-      }
-      else
-      {
-        printf("unligal word : %s \n",p);
-        *error=-1;
-        return NULL;
-      }
-    }
+    printf("aviad test aaaaaaaaaaaa");
   }
-  *error=0; /*no error*/
-  return NULL;/*but is not a symbol*/
 }
-
-char* IsLabel(char *p,int *error)
-{
-  while (isspace(*p)) {
-    p++;
-  }
-  if(!(isalpha(*p)&&*p!='.'))
-  {
-    printf("unligal word : %s \n",p);
-    *error=ERROR;
-    return NULL;
-  }
+return 0;
 }

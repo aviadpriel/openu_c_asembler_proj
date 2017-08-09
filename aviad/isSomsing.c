@@ -184,6 +184,7 @@ int isImmediateAddressing(char * buff,int line)
 int isDirectiveAddressing(char * buff,int line)
 {
   int i;
+  int labelLen;
   /*skip spaces and tabs*/
   while (isspace(*buff)) {buff++;}
 
@@ -198,16 +199,25 @@ int isDirectiveAddressing(char * buff,int line)
     if(!isalnum(buff[i])){return 0;}   
    i++;
   }/*end while loop*/
+  labelLen=i;
   /*check if the lable is a reserved word*/
     if ((isAction(buff) != -2)||(isDirective(buff) != -2)||isRegister(buff)!=-2) 
     {
+        printf("error:line %d: operend cannot be a reserved word!! \n",line);
       return ERROR;
     }
     i++;
     while (isspace(buff[i])) {i++;}/**/
     if(buff[i]!='\0')
     return ERROR;
-
+    /*All tests have been done so word is a labe
+    test the len of the label
+    */
+    if(labelLen>LABEL_MAX_LEN)
+    {
+        printf("ERROR:line %d:max lenght of label is %d ",LABEL_MAX_LEN,line);
+        return ERROR;
+    }
     /*All tests have been done so word is a labe*/
     return 1;
 }/*end isDirectiveAddressing function */
