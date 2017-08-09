@@ -6,6 +6,7 @@
 #define ERROR -1
 #define LINE_LENGTH 81
 /*evgeny : Declaration of functions that must be written (in another file)*/
+int isComment(char * buff);
 int isDirective(char *command);
 int isAction(char *command);
 int isRegister(char *buf);
@@ -38,14 +39,27 @@ if(!line)
     int error =0,functionIndex;
     char *buff;
     char *label;
-	buff=strtok(line," ");
+    buff=strtok(line," ");
+    /*chack if line is comment or a empty line*/
+  if(!isComment(buff)||*buff=='\n')
+  {
+    lineCounter++;
+      continue;/*no need to do the other tests*/
+  }
 	label=isLabel(buff,&error,lineCounter);
     if(error ==ERROR)
     {
       errorFlag=ON;
+      continue;/*no need to do the other tests*/
     }else if(label!=NULL)/*we have a label!! :)*/
     {
       buff= strtok(NULL," ");/*we go to the next word*/
+      if(*buff=='\n'||buff==NULL)
+      {
+      printf("error:line %d:cannot add a label wite a empty line\n",lineCounter);/*evgeny corrct me!!!!*/
+      lineCounter++;
+      continue;/*no need to do the other tests*/
+      }
     }
     if((functionIndex =isDirective(buff))!=-2)/*the function is directive stetment*/
     {SWITCHER matrixF=OFF;
@@ -111,10 +125,10 @@ if(!line)
     {
       int curIc=*ic;
       buff= strtok(NULL,"\n");/*we get the rest of the line*/
-	  if(identification(buff,functionIndex,lineCounter,ic)==ERROR)
-	  {
+	    if(identification(buff,functionIndex,lineCounter,ic)==ERROR)
+	    {
 		      errorFlag=ON;
-	  }else if(label)
+	    }else if(label)
       {
         if(addLabel(labelsHead,label,ON,OFF,OFF,curIc,lineCounter)==ERROR)
           		errorFlag=ON;
@@ -122,6 +136,7 @@ if(!line)
     }
     else /*unligal stetment print error*/
     {
+      errorFlag=ON;      
       printf("evgeny put a normal error messege: %s \n",buff);
     }
 

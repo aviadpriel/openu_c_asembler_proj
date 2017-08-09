@@ -3,11 +3,12 @@ int isdirective(char *command); check
 int isAction(char *command); check
 int isLabel(char *command);check check 
 *********************************************
+בדיקת באגים בריצה ראשונה + כתיבת פונקציה לזיהוי הערות בקובץ 1
+2 תיעוד מסודר
+3 שינוי מספרי קסם
+4יעול פונקציות 
 
-pasdocode for first_run(char []line);
-
-int first_run(char line[])
+1. 
 {
-    
-    char *buff=strtok(line)
+    1.כתיבת פונקציה לזיהוי הערות 
 }

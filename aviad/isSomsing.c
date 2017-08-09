@@ -4,6 +4,7 @@
 #include <ctype.h>
 #define ERROR -1
 #define LABEL_MAX_LEN 30
+#define COMMENT_FLAG ';'
 int countrChars(char *word,char c,int line);
 typedef struct commandList{
 char *name;  
@@ -12,6 +13,23 @@ int firstOperendGroup;
 int secondOperendGroup;
 }commandList;
 typedef enum {EMPTY=-1,IMMEDIATELY=0,DIRECT=1,MATRIX=2,REG_DIRECT=3} addressing_method;
+static commandList _action[]={{"mov",2,4,3},
+				{"cmp",2,4,4},
+				{"add",2,4,3},
+				{"sub",2,4,3},
+				{"lea",2,2,3},
+				{"not",1,0,3},
+				{"clr",1,0,3},
+				{"inc",1,0,3},
+				{"dec",1,0,3},
+				{"jmp",1,0,3},
+				{"bne",1,0,3},
+				{"red",1,0,3},
+				{"prn",1,0,4},
+				{"jsr",1,0,3},
+				{"rts",0,0,0},
+				{"stop",0,0,0},
+				{NULL,0,0,0}};
 /*whte we have in this file
 isDirective -work
 isAction -work
@@ -29,6 +47,16 @@ int isRegister(char *buf);
 char * isLabel(char * buf,int *error,int line);
 
 /**/
+int isComment(char * buff)
+{
+    int i=0;
+    while(isspace(buff[i])){i++;}
+    if(buff[i]==COMMENT_FLAG)
+    {
+        return 0;
+    }
+    return -2;
+}
 int isDirective(char *command)
 {
     int functionLen;
@@ -47,7 +75,8 @@ for(i=0;i<5;i++)
 {
     if(strncmp(cmd[i].string,command,functionLen)==0)
     {
-     return i;
+        if((strlen(cmd[i].string))==(functionLen)) 
+            return i;
     }
 }
     return -2;
@@ -81,8 +110,8 @@ for(i=0;i<16;i++)
 {
     if(strncmp(cmd[i].string,command,functionLen)==0)
     {
-     return i;
-     
+        if((strlen(cmd[i].string))==(functionLen)) 
+            return i;
     }
 }
      return -2;
@@ -103,15 +132,21 @@ char * isLabel(char *buf,int *error,int line)
     *error=ERROR;
     return NULL;
   }
+  /*if buf can be a directiv function*/
+  if(*buf=='.')
+    {
+    *error=0; /*no error*/
+    return NULL;/*but is not a label*/
+    }
   i=0;
   while(buf[i]!='\0')
   {
     /*Check whether the word contains only letters or numbers*/
-    if(!isalnum(buf[i])&&buf[i]!=':'&&buf[0]!='.')
+    if(!isalnum(buf[i])&&buf[i]!=':'&&buf[0]!='.'&&buf[i]!='\n')
     {
-    printf("error:line %d: unligal word : %s \n",line,buf);
-    *error=ERROR;
-    return NULL;
+        printf("error:line %d: unligal word : %s \n",line,buf);
+        *error=ERROR;
+        return NULL;
     }
 
     if(buf[i]==':')
@@ -142,7 +177,7 @@ char * isLabel(char *buf,int *error,int line)
   if(colonFlag!=ON)
   {
     *error=0; /*no error*/
-    return NULL;/*but is not a symbol*/
+    return NULL;/*but is not a label*/
   }
 
   /*check if the lable is a reserved word*/
@@ -343,26 +378,23 @@ return 1;
 int identification(char * buff,int functionIndex,int line,int *ic)
 {
 addressing_method firstOp,secondOp;    
-int firstCost=0,secondCost=0,rval=0;    
-commandList cmd[]={{"mov",2,4,3},
-				{"cmp",2,4,4},
-				{"add",2,4,3},
-				{"sub",2,4,3},
-				{"lea",2,2,3},
-				{"not",1,0,3},
-				{"clr",1,0,3},
-				{"inc",1,0,3},
-				{"dec",1,0,3},
-				{"jmp",1,0,3},
-				{"bne",1,0,3},
-				{"red",1,0,3},
-				{"prn",1,0,4},
-				{"jsr",1,0,3},
-				{"rts",0,0,0},
-				{"stop",0,0,0},
-				{NULL,0,0,0}};
+int firstCost=0,secondCost=0,rval=0;
+int cammaCounter;
+if(buff)
+{
+    cammaCounter=countrChars(buff,',',line);
+    if(cammaCounter==ERROR)
+    {
+        return ERROR;
+    }
+} else if(_action[functionIndex].operends!=0)
+    {
+        printf("error:line %d:no operends for \"%s\" \n",line,_action[functionIndex].name);
+        return ERROR;
+    
+    }
 
-if(cmd[functionIndex].operends==0)/*if no operends*/
+if(_action[functionIndex].operends==0)/*if no operends*/
 {
     if(buff==NULL)
     {
@@ -371,32 +403,46 @@ if(cmd[functionIndex].operends==0)/*if no operends*/
     }
 
  while(!isspace(*buff)){buff++;}
- if(*buff!='\0')
+ if(buff!=NULL)
  {
-   printf("no need operends for %s function.\n",cmd[functionIndex].name);  
+   printf("no need operends for %s function.\n",_action[functionIndex].name);  
    return ERROR;  
  }
     *ic+=1;/*for PSW*/
     return 0;
-}else if(cmd[functionIndex].operends==1)
+}else if(_action[functionIndex].operends==1)
 {
-    if(strcmp("prn",cmd[functionIndex].name)==0)
+    if(cammaCounter>0)
+    {
+        printf ("ERROR:line %d:implicit declaration of function ‘%s’ \n",line,_action[functionIndex].name);
+        return ERROR;
+    }
+    if(strcmp("prn",_action[functionIndex].name)==0)
     {
     rval=isImmediateAddressing(buff,line);
     if(rval==1)
     {
-     *ic+=2;   
+        *ic+=2;
+        return 0;  
+    }else if(rval == ERROR)
+        {
+            return ERROR;
+        }
+    }
+    rval=isRegister(buff);
+    if(rval!=-2)
+    {
+        *ic+=2;/*1 for PSW and 1 for the register*/
+        return 0;   
     }else if(rval == ERROR)
     {
         return ERROR;
     }
-    return 0;
-    }
     rval=isDirectiveAddressing(buff,line);
     if(rval==1)
     {
-     *ic+=2;
-      return 0;   
+        *ic+=2;
+        return 0;   
     }else if(rval == ERROR)
     {
         return ERROR;
@@ -404,32 +450,28 @@ if(cmd[functionIndex].operends==0)/*if no operends*/
     rval=isMatrix(buff,line,NULL,NULL);/*NULL becuse we donte need the regestres*/
     if(rval==1)
     {
-     *ic+=3; /*1 for PSW and 2 for the metrix*/
-      return 0;   
-    }else if(rval == ERROR)
-    {
-        return ERROR;
-    }
-    rval=isRegister(buff);
-    if(rval!=-2)
-    {
-     *ic+=2;/*1 for PSW and 1 for the register*/
-      return 0;   
+        *ic+=3; /*1 for PSW and 2 for the metrix*/
+        return 0;   
     }else if(rval == ERROR)
     {
         return ERROR;
     } 
-    
-    printf("ERROR:line %d:unvalid dest opernd",line);
+     printf ("ERROR:line %d:implicit declaration of dest oprend in function ‘%s’ \n",line,_action[functionIndex].name);
     return ERROR;
-} else if(cmd[functionIndex].operends==2)
+} else if(_action[functionIndex].operends==2)
     {
-        int i=countrChars(buff,',',line);
         char *tok;
-        if(i!=1)
+        if(cammaCounter!=1)
         {
-            printf ("ERROR:line %d:no , between the operends",line);
-            return ERROR;
+            if(cammaCounter==0)
+            {
+                printf ("ERROR:line %d:no , between the operends \n",line);
+                            return ERROR;
+            }else if(cammaCounter>0)
+            {
+                printf ("ERROR:line %d:implicit declaration of the oprends in function ‘%s’ \n",line,_action[functionIndex].name);
+                return ERROR;
+            }    
         }
         
         firstOp=EMPTY;
