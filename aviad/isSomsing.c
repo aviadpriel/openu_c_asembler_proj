@@ -519,7 +519,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         }
         /*calculet the second operend*/
          tok=strtok(NULL,"\0");
-         if(!tok)
+         if((!isEmpty(tok)))
         {
             printf("ERROR:line %d: miseeng a second operend \n",line);
             return ERROR;
@@ -635,7 +635,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         return 0;
     }
      while(buff&&isspace(buff[i])){i++;}
-     if(!buff)
+     if((!buff[i]))
      {
          return 0;
      }
