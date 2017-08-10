@@ -98,10 +98,10 @@ int addLabel(labelsList **labelsHead, char *label,SWITCHER action,SWITCHER exter
 
 void freeDataList(dataList **dataHead)
 {
-    while (start != null)
+    while (dataHead != null)
     { 
-        node* temp = start; 
-        start = start -> next;
+        dataList* temp = *start; 
+        *start = *start -> next;
         free(temp);
     }
 }
