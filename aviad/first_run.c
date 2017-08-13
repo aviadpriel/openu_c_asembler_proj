@@ -1,3 +1,28 @@
+/*
+ ============================================================================
+ ============================= Maman 14 =====================================
+ File Name   : first_run.c
+ Semester    : 2017b
+ Description : the function which runs the first part of the algorithm
+ ============================================================================
+pasado-code of function first_run
+1. If a null is returned, go to 8
+2. If it is an empty row or a note line, return to 1
+3. Take a word from the line
+4. If it is a label save it and go to the next word
+5. If this is the guide function, do related actions to the guide function and return to 1
+6. If this is an action function, do related actions to the guide function and return to 1
+7. An error message has been sent: Unrecognized / valid expression, return to 1
+8. If an error has occurred so far, refund another refund 0
+
+Discounts
+1. The maximum length of the line is 80
+
+Remarks
+1. The tests of the guidance functions are performed in the DirectiveTest.c
+  2. Tests of the operation functions are performed in
+3. Related operations = (in the health + housing + assignment in data structures + calculation of ic / dc)
+*/
 #include "struct.h"
 #include<stdio.h>
 #include<ctype.h>
