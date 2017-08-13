@@ -16,5 +16,7 @@ exit(1);
 
 rval=first_run(fp,&labelsHead,&dataHead,&dc,&ic); 
 printf("ic is :%d \n dc is :%d \n rval is :%d \n",ic,dc,rval);   
+freeDataList(dataHead);
+freeLabelsList(labelsHead);
 return 0;
 }

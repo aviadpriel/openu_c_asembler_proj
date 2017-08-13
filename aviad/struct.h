@@ -30,3 +30,5 @@ int operendGroup;
 void insertData(dataList **dataHead,int data);
 int addLabel(labelsList **labelsHead, char *label,SWITCHER action,SWITCHER external,
  SWITCHER data, int address,int line);
+ void freeDataList(dataList *dataHead);
+void freeLabelsList(labelsList *labelsHead);
