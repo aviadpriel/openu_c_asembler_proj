@@ -1,6 +1,6 @@
-#include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <stdlib.h> 
 #define WORD_SIZE 10
 #define ERROR -1
 

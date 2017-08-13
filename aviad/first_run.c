@@ -50,6 +50,8 @@ if(!line)
     if(error ==ERROR)
     {
       errorFlag=ON;
+      lineCounter++;
+      memset(line,'\0',LINE_LENGTH);
       continue;/*no need to do the other tests*/
     }else if(label!=NULL)/*we have a label!! :)*/
     {
@@ -57,19 +59,22 @@ if(!line)
       if(*buff=='\n'||buff==NULL)
       {
       printf("error:line %d:cannot add a label wite a empty line\n",lineCounter);/*evgeny corrct me!!!!*/
+      errorFlag=ON;
       lineCounter++;
+      memset(line,'\0',LINE_LENGTH);
       continue;/*no need to do the other tests*/
       }
     }
     if((functionIndex =isDirective(buff))!=-2)/*the function is directive stetment*/
-    {SWITCHER matrixF=OFF;
+    {
+      SWITCHER matrixF=OFF;
       char *temp=NULL;
       if(functionIndex==2)
       {
-       int i=0;
-       while(buff[i]!='['&&buff[i]!='\0'){i++;}
-       if(buff[i]=='[')
-       {
+        int i=0;
+        while(buff[i]!='['&&buff[i]!='\0'){i++;}
+        if(buff[i]=='[')
+        {
           buff+=i;
           temp=(char *)malloc(sizeof(char)*(strlen(buff)));
           strcpy(temp,buff);
@@ -79,33 +84,33 @@ if(!line)
       buff= strtok(NULL,"\n");/*we get the rest of the line*/
       if(matrixF==ON)
       {
-      temp=(char *)realloc(temp,sizeof(char)*(strlen(buff)+strlen(temp)));
-      strcat(temp,buff);
-      buff=temp;
+        temp=(char *)realloc(temp,sizeof(char)*(strlen(buff)+strlen(temp)));
+        strcat(temp,buff);
+        buff=temp;
       }
       switch(functionIndex)
       {
         case 0:/*.data function*/
         {
         if(dataF(buff,label,dc,dataHead,labelsHead,lineCounter)==ERROR)
-          {errorFlag=ON;}
+            {errorFlag=ON;}
 
           break;        
         }
         case 1:/*.string function*/
         {
         if(stringF(buff,label,dc,dataHead,labelsHead,lineCounter)==ERROR)
-          {errorFlag=ON;}
+            {errorFlag=ON;}
                     break;        
         }
         case 2:/*.mat function*/
         {
         if(matF(buff,label,dc,dataHead,labelsHead,lineCounter)==ERROR)
-          {errorFlag=ON;}
-          if(matrixF ==ON)
-          {
-            free(temp);
-          }
+            {errorFlag=ON;}
+            if(matrixF ==ON)
+            {
+              free(temp);
+            }
                     break;        
         }
         case 3:/*.entry function*/

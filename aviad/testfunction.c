@@ -7,6 +7,7 @@ int isDirectiveAddressing(char * buff,int line);/*from isSome.c*/
 #define ERROR -1
 int countrChars(char *word, char c,int line);
 /*get numbers from comma list like 2,3,6,4,8,9*/
+ int isEmpty(char * buff);
 int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc,int line);
 typedef struct commends
 {
@@ -17,6 +18,11 @@ int dataF(char *command, char *label,int *dc, dataList **dataHead, labelsList **
 {
   int cummaCounter = 0, i = 0, currDc;
   currDc = *dc;
+  if(!isEmpty(command))
+  {
+    printf("error:line %d; no arguments for .data function\n",line);
+    return ERROR;
+  }
   /*count commas to get how much numbers we have to insern*/
   while (command[i] != '\0')
   {
@@ -55,8 +61,14 @@ int dataF(char *command, char *label,int *dc, dataList **dataHead, labelsList **
 int stringF(char *command, char *label, int *dc, dataList **dataHead, labelsList **labelsHead,int line)
 {
   int currDc = *dc, i;
-  int countr = countrChars(command, '\"',line);
+  int countr =0;
   int data;
+    if(!isEmpty(command))
+  {
+    printf("Error:line %d: Missing arguments\n",line);
+    return ERROR;
+  }
+  countr=countrChars(command, '\"',line);
   if (countr != 2)
   {
     return ERROR;
@@ -116,6 +128,11 @@ int matF(char *buff,char *label,int *dc,dataList **dataHead,labelsList **labelsH
   int currDc = *dc, counter, matRow, matColum, matLen,diff;
   char openBracket='[',closeBracket=']';
 int openCunter=0,closeCunter=0,i=0;
+  if(!isEmpty(buff))
+  {
+    printf("Error:line %d: Missing arguments\n",line);
+    return ERROR;
+  }
 while(buff[i]!='\0')
 {
     if(buff[i]==openBracket)
@@ -137,6 +154,8 @@ while(buff[i]!='\0')
 }
 if(closeCunter!=2 ||openCunter !=2)
 {
+printf("error:line %d: in .mat [num1][num2] format\n",line);
+printf("mesing brackets !! \n");
  return ERROR;
 }
 
@@ -144,7 +163,7 @@ if(closeCunter!=2 ||openCunter !=2)
   {
     if (!isspace(*buff))
     {
-      printf("error:line %d: in .mat [num1][num2] format: .mat n",line);
+printf("error:line %d: in .mat [num1][num2] format\n",line);
       return ERROR;
     }
     buff++;
@@ -156,7 +175,7 @@ if(closeCunter!=2 ||openCunter !=2)
   {
     if (!isspace(*buff))
     {
-      printf("error:line %d: in .mat [num1][num2] format: .mat n",line);
+printf("error:line %d: in .mat [num1][num2] format\n",line);
       return ERROR;
     }
     buff++;
@@ -166,14 +185,14 @@ if(closeCunter!=2 ||openCunter !=2)
   {
     if (!isspace(*buff))
     {
-      printf("error:line %d: in .mat [num1][num2] format: .mat n",line);
+printf("error:line %d: in .mat [num1][num2] format\n",line);
       return ERROR;
     }
     buff++;
   }
   if (*buff != '[')
   {
-      printf("error:line %d: in .mat [num1][num2] format: .mat n",line);
+    printf("error:line %d: in .mat [num1][num2] format\n",line);
     return ERROR;
   }
     buff++;
@@ -182,7 +201,7 @@ if(closeCunter!=2 ||openCunter !=2)
   {
     if (!isspace(*buff))
     {
-      printf("error:line %d: in .mat [num1][num2] format: .mat n",line);
+      printf("error:line %d: in .mat [num1][num2] format\n",line);
       return ERROR;
     }
     buff++;
@@ -195,7 +214,7 @@ if(closeCunter!=2 ||openCunter !=2)
   matLen = matColum * matRow;
   if (!matLen)
   {
-    printf("error:line %d: in .mat [num1][num2] format: .mat n",line);
+    printf("error:line %d: in .mat [num1][num2] format\n",line);
     printf("num1 and num2 Must be greater than 0 n");
     return ERROR;
   }
@@ -213,8 +232,9 @@ if(closeCunter!=2 ||openCunter !=2)
   }
   else if(counter>=matLen)
   {
-  printf(" error:line %d too many arguments to function .mat \n",line);
-  return ERROR;
+    printf("error:line %d: in .mat [num1][num2] format\n",line);
+    printf(" error:line %d too many arguments to function .mat \n",line);
+    return ERROR;
   }
   else
   {
@@ -223,12 +243,12 @@ if(closeCunter!=2 ||openCunter !=2)
   }
     if(matLen>(counter+1))
     {
-    diff = matLen-(counter+1);
-    for (; diff > 0; diff--)
-    {
-      insertData(dataHead, 0);
-      (*dc)++;
-    }
+      diff = matLen-(counter+1);
+      for (; diff > 0; diff--)
+      {
+        insertData(dataHead, 0);
+        (*dc)++;
+      }
     }  
 
   /*add label if exzist one */
@@ -246,9 +266,16 @@ if(closeCunter!=2 ||openCunter !=2)
   }
   return 0;
 } /*end of matF function*/
+
 int externF(char *buff,char *label,labelsList **labelsHead,int line)
 {
-  int cunter=countrChars(buff,',',line);
+  int cunter =0;
+  if(!isEmpty(buff))
+  {
+    printf("Error:line %d: Missing arguments\n",line);
+    return ERROR;
+  }
+  cunter=countrChars(buff,',',line);
    if(label)
           {
             printf("warnning:line %d:no need lable for .extern function.\n",line);
@@ -306,6 +333,11 @@ int externF(char *buff,char *label,labelsList **labelsHead,int line)
 int entryF(char * buff,char *label,int line)
 {
   int rval;
+   if(!isEmpty(buff))
+  {
+    printf("Error:line %d: Missing arguments\n",line);
+    return ERROR;
+  }
     if(label)
           {
             printf("warnning:line %d:no need lable for .entry function.\n",line);
@@ -322,6 +354,8 @@ int entryF(char * buff,char *label,int line)
  printf("error : line %d: unligal label!!\n",line);
  return ERROR;
 }
+
+
  int countrChars(char *word, char c,int line)
 {
   int counter = 0;
@@ -347,6 +381,11 @@ int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc,int 
   char *cp;
   int data;
   /*get the data to the Datalist*/
+  if(*command==',')
+  {
+    printf("error:line %d evgeny \n",line);
+    return ERROR;
+  }
   cp = strtok(command, ",");
   if (cummaCounter == 0)
   { /*we have only one number*/
@@ -370,15 +409,15 @@ int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc,int 
   {
     if(!cp)
     {
-      printf("i found the bug\n");
-      exit(1);
+      printf("Error:line %d; No  \n",line);/*TODO*/
+      return ERROR;
     }else 
     {
       int i=0;
       while(isspace(cp[i])&&cp[i]!='\0'){i++;}
       if(cp[i]=='\0')
       {
-        printf("error:line %d: no data between two commas \n ",line);
+        printf("error:line %d: no data between two commas \n ",line);/*TODO*/
         return ERROR;
       }
 

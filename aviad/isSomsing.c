@@ -42,10 +42,7 @@ static commandList _directive[]={
            {".entry"},
            {".extern"}};
 typedef enum {ON,OFF,WAIT} SWITCHER;
-typedef struct stringArry
-    {
-    char *string;
-    }stringArry;
+
 int isDirective(char *command);
 int isAction(char *command);
 int isRegister(char *buf);
@@ -89,36 +86,19 @@ for(i=0;i<5;i++)
 int isAction(char *command)
 {
     int i=0,functionLen=0;
-    stringArry cmd[]={
-           {"mov"},
-           {"cmp"},
-           {"add"},
-           {"sub"},
-           {"lea"},
-           {"not"},
-           {"clr"},
-           {"inc"},
-           {"dec"},
-           {"jmp"},
-           {"bne"},
-           {"red"},
-           {"prn"},
-           {"jsr"},
-           {"rts"},
-           {"stop"}};
-            /*skip spaces and tabs*/   
-while(isspace(*command)){command++;}
-while(!isspace(command[i])&&command[i]!='\0'){i++;}
-functionLen = i;
-for(i=0;i<16;i++)
-{
-    if(strncmp(cmd[i].string,command,functionLen)==0)
+    /*skip spaces and tabs*/   
+    while(isspace(*command)){command++;}
+    while(!isspace(command[i])&&command[i]!='\0'){i++;}
+    functionLen = i;
+    for(i=0;i<16;i++)
     {
-        if((strlen(cmd[i].string))==(functionLen)) 
-            return i;
+        if(strncmp(_action[i].name,command,functionLen)==0)
+        {
+            if((strlen(_action[i].name))==(functionLen)) 
+                return i;
+        }
     }
-}
-     return -2;
+    return -2;
 }/*end of isAction*/
 
 
@@ -132,7 +112,7 @@ char * isLabel(char *buf,int *error,int line)
   /*Check whether the word begins with a letter or "." */
   if((!isalpha(*buf))&&*buf!='.')
   {
-    printf("error:line %d: unligal word : %s \n",line,buf);
+    printf("error:line %d: Invalid word / phrase : %s \n",line,buf);
     *error=ERROR;
     return NULL;
   }
@@ -148,7 +128,7 @@ char * isLabel(char *buf,int *error,int line)
     /*Check whether the word contains only letters or numbers*/
     if(!isalnum(buf[i])&&buf[i]!=':'&&buf[0]!='.'&&buf[i]!='\n')
     {
-        printf("error:line %d: unligal word : %s \n",line,buf);
+        printf("error:line %d: Invalid word / phrase : %s \n",line,buf);
         *error=ERROR;
         return NULL;
     }
@@ -172,7 +152,7 @@ char * isLabel(char *buf,int *error,int line)
       }
       else
       {
-    printf("error:line %d: unligal word : %s \n",line,buf);
+    printf("error:line %d: Invalid word / phrase : %s \n",line,buf);
         *error=ERROR;
         return NULL;
       }
@@ -482,7 +462,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         secondOp=EMPTY;
         /*calculet the first operend*/
         tok=strtok(buff,",");
-        if(!isEmpty(tok))
+        if(!isEmpty(tok)||*buff==',')
         {
             printf("ERROR:line %d: miseeng a first operend \n",line);
             return ERROR;
