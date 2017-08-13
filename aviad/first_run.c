@@ -10,26 +10,25 @@ pasado-code of function first_run
 2. If it is an empty row or a note line, return to 1
 3. Take a word from the line
 4. If it is a label save it and go to the next word
-5. If this is the guide function, do related actions to the guide function and return to 1
-6. If this is an action function, do related actions to the guide function and return to 1
+5. If this is the directive function, do related actions to the directive function and return to 1
+6. If this is an action function, do related actions to the action function and return to 1
 7. An error message has been sent: Unrecognized / valid expression, return to 1
-8. If an error has occurred so far, refund another refund 0
+8. If an error has occurred so far, return ERROR another return 0
 
 Discounts
 1. The maximum length of the line is 80
 
 Remarks
 1. The tests of the guidance functions are performed in the DirectiveTest.c
-  2. Tests of the operation functions are performed in
+  2. Tests of the actions functions are performed in 
 3. Related operations = (in the health + housing + assignment in data structures + calculation of ic / dc)
 */
+#include "consts.h"
 #include "struct.h"
 #include<stdio.h>
 #include<ctype.h>
 #include<stdlib.h>
 #include<string.h>
-#define ERROR -1
-#define LINE_LENGTH 81
 /*evgeny : Declaration of functions that must be written (in another file)*/
 int isComment(char * buff);
 int isDirective(char *command);
@@ -52,16 +51,17 @@ int first_run(FILE *fp,labelsList **labelsHead,dataList **dataHead,int *dc,int *
   int lineCounter=1 ;/*for print errors*/
   /*Confirming the cursor to the beginning of the file*/
   fseek(fp,0,SEEK_SET);
-line=(char *)malloc(sizeof(char)*LINE_LENGTH);
-if(!line)
-{
-  printf("out of memory");
-  exit(1);
-}
+  *ic=INIT_IC;
+  line=(char *)malloc(sizeof(char)*LINE_LENGTH);
+  if(!line)
+  {
+    printf("out of memory");
+    exit(1);
+  }
   while(fgets( line, LINE_LENGTH,fp))
   {
 
-    int error =0,functionIndex;
+    int error =TRUE,functionIndex;
     char *buff;
     char *label;
     buff=strtok(line," ");
@@ -69,6 +69,7 @@ if(!line)
   if(!isComment(buff)||*buff=='\n')
   {
     lineCounter++;
+    memset(line,'\0',LINE_LENGTH);
       continue;/*no need to do the other tests*/
   }
 	label=isLabel(buff,&error,lineCounter);
@@ -115,20 +116,20 @@ if(!line)
       }
       switch(functionIndex)
       {
-        case 0:/*.data function*/
+        case DATA:/*.data function*/
         {
         if(dataF(buff,label,dc,dataHead,labelsHead,lineCounter)==ERROR)
             {errorFlag=ON;}
 
           break;        
         }
-        case 1:/*.string function*/
+        case STRING:/*.string function*/
         {
         if(stringF(buff,label,dc,dataHead,labelsHead,lineCounter)==ERROR)
             {errorFlag=ON;}
                     break;        
         }
-        case 2:/*.mat function*/
+        case MATRIXF:/*.mat function*/
         {
         if(matF(buff,label,dc,dataHead,labelsHead,lineCounter)==ERROR)
             {errorFlag=ON;}
@@ -138,20 +139,20 @@ if(!line)
             }
                     break;        
         }
-        case 3:/*.entry function*/
+        case ENTRY:/*.entry function*/
         {
           if(entryF(buff,label,lineCounter)==ERROR)
           {errorFlag=ON;}
                     break;
         }
-        case 4:/*.extern function*/
+        case EXTERN:/*.extern function*/
         {
           if(externF(buff,label,labelsHead,lineCounter)==ERROR)
           {errorFlag=ON;}
                     break;
         }
       }
-    } else if((functionIndex =isAction(buff))!=-2)/*the function is action stetment*/
+    } else if((functionIndex =isAction(buff))!=NOT_EXIST)/*the function is action stetment*/
     {
       int curIc=*ic;
       buff= strtok(NULL,"\n");/*we get the rest of the line*/
@@ -174,11 +175,16 @@ if(!line)
     memset(line,'\0',LINE_LENGTH);
   }/*end of big while*/
 free(line);
-  if(errorFlag==OFF)
+
+if(*dc==0 && *ic==INIT_IC)/*chack if is no a empty file */
   {
-	return 0;  
+    printf("this is a emty file \n");
+      return ERROR;
+  } 
+  else if(errorFlag== OFF)
+  {
+	  return TRUE;  
   }
-  else
   return ERROR;
 }
 

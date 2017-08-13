@@ -2,13 +2,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <ctype.h>
-#define ERROR -1
-#define LABEL_MAX_LEN 30
-#define COMMENT_FLAG ';'
+#include "consts.h"
 /*פונקציות עזר*/
  int isEmpty(char * buff);
-int countrChars(char *word,char c,int line);
-/*          */
+int countrChars(char *word,char c,int line);/*from testFunction.c*/
 /*מבנה נתונים לאחסון הפונקציות*/
 typedef struct commandList{
 char *name;  
@@ -17,7 +14,6 @@ int firstOperendGroup;
 int secondOperendGroup;
 }commandList;
 /*לזיהוי סוג המיעון*/
-typedef enum {EMPTY=-1,IMMEDIATELY=0,DIRECT=1,MATRIX=2,REG_DIRECT=3} addressing_method;
 static commandList _action[]={{"mov",2,4,3},
 				{"cmp",2,4,4},
 				{"add",2,4,3},
@@ -41,24 +37,33 @@ static commandList _directive[]={
            {".mat"},
            {".entry"},
            {".extern"}};
-typedef enum {ON,OFF,WAIT} SWITCHER;
 
 int isDirective(char *command);
 int isAction(char *command);
 int isRegister(char *buf);
 char * isLabel(char * buf,int *error,int line);
 
-/**/
+/*chack if the line is a comment
+returns
+if is comment TRUE
+else NOT_EXIST 
+*/
 int isComment(char * buff)
 {
     int i=0;
     while(isspace(buff[i])){i++;}
     if(buff[i]==COMMENT_FLAG)
     {
-        return 0;
+        return TRUE;
     }
-    return -2;
+    return NOT_EXIST;
 }
+/*get a word and chack if is a name of
+* directive function
+*if is a name of directive function
+*return the index of the function (0-4)
+*else return NOT_EXIST
+*/
 int isDirective(char *command)
 {
     int functionLen;
@@ -70,7 +75,7 @@ while(!isspace(command[i])&&command[i]!='\0'&&command[i]!='['){i++;}
 functionLen = i;
 for(i=0;i<5;i++)
 {
-    if(strncmp(_directive[i].name,command,functionLen)==0)
+    if(strncmp(_directive[i].name,command,functionLen)==TRUE)
     {
         if((strlen(_directive[i].name))==(functionLen)) 
             return i;
@@ -80,9 +85,15 @@ for(i=0;i<5;i++)
             }
     }
 }
-    return -2;
+    return NOT_EXIST;
 }/*end of isDirective function*/
 
+/*get a word and chack if is a name of
+* action function
+*if is a name of action function
+*return the index of the function (0-15)
+*else return NOT_EXIST
+*/
 int isAction(char *command)
 {
     int i=0,functionLen=0;
@@ -92,17 +103,21 @@ int isAction(char *command)
     functionLen = i;
     for(i=0;i<16;i++)
     {
-        if(strncmp(_action[i].name,command,functionLen)==0)
+        if(strncmp(_action[i].name,command,functionLen)==TRUE)
         {
             if((strlen(_action[i].name))==(functionLen)) 
                 return i;
         }
     }
-    return -2;
+    return NOT_EXIST;
 }/*end of isAction*/
 
 
-/*This function is designed to check a new label at the beginning of a line*/
+/*This function is designed to check a new label at the beginning of a line
+*it return a the label in char *
+*else it return NULL (if is not label or have some error)
+* also if have some error it put in (int *error) ERROR 
+*/
 char * isLabel(char *buf,int *error,int line)
 {
   SWITCHER colonFlag=OFF;/*colon is ":"*/
@@ -119,7 +134,7 @@ char * isLabel(char *buf,int *error,int line)
   /*if buf can be a directiv function*/
   if(*buf=='.')
     {
-    *error=0; /*no error*/
+    *error=TRUE; /*no error*/
     return NULL;/*but is not a label*/
     }
   i=0;
@@ -160,12 +175,12 @@ char * isLabel(char *buf,int *error,int line)
   }/*end while loop*/
   if(colonFlag!=ON)
   {
-    *error=0; /*no error*/
+    *error=TRUE; /*no error*/
     return NULL;/*but is not a label*/
   }
 
   /*check if the lable is a reserved word*/
-    if ((isAction(buf) != -2)||(isDirective(buf) != -2)||isRegister(buf)!=-2) 
+    if ((isAction(buf) != NOT_EXIST)||(isDirective(buf) != NOT_EXIST)||isRegister(buf)!=NOT_EXIST) 
     {
       printf("error:line %d:  the label cant be a reserved word!!",line);
       *error= ERROR;
@@ -173,21 +188,29 @@ char * isLabel(char *buf,int *error,int line)
     }
 
     /*All tests have been done so word is a labe*/
-    *error =0;
+    *error =TRUE;
     return buf;
 }/*end isLabel function */
 
+/************************************************/
+/*functions for Addressing methods
 
-/*6/8/17 work on ic calculate*/
+get a operend of action function
+end
+return ERROR if have some error
+else
+return VALID if is the Addressing method
+else
+return NOT_EXIST if is not the Addressing method
+*/
 
-/*functions for Addressing methods*/
-
+/*immediate addressing*/
 int isImmediateAddressing(char * buff,int line)
 {
     char *rest;
     char asterisk='#';
     while(isspace(*buff)){buff++;}
-    if(*buff!=asterisk){return 0;}/*is not a immediate addressing */
+    if(*buff!=asterisk){return TRUE;}/*is not a immediate addressing */
     buff++;/*skip the asterisk */
     if ((!isdigit(*buff))&&(*buff!='-')&&(*buff!='+'))
     {
@@ -197,9 +220,10 @@ int isImmediateAddressing(char * buff,int line)
     strtol(buff,&rest,10);
     while(isspace(*rest)) rest++;
     if(*rest!='\0')return ERROR;/*Because an asterisk has only an immediate address*/ 
-    return 1;/*buff is Immediate Addressing operend */
-}
+    return VALID;/*buff is Immediate Addressing operend */
+}/*end of isImmediateAddressing*/
 
+/*directive addressing*/
 int isDirectiveAddressing(char * buff,int line)
 {
   int i;
@@ -209,7 +233,7 @@ int isDirectiveAddressing(char * buff,int line)
 
   if((!isalpha(*buff)))
   {
-    return 0;/*is not a label*/
+    return NOT_EXIST;/*is not a label*/
   }
   i=0;
   while(!isspace(buff[i])&&buff[i]!='\0')
@@ -220,11 +244,11 @@ int isDirectiveAddressing(char * buff,int line)
   }/*end while loop*/
   labelLen=i;
   /*check if the lable is a reserved word*/
-    if ((isAction(buff) != -2)||(isDirective(buff) != -2)||isRegister(buff)!=-2) 
-    {
-        printf("error:line %d: operend cannot be a reserved word!! \n",line);
-      return ERROR;
-    }
+  if ((isAction(buff) != NOT_EXIST)||(isDirective(buff) != NOT_EXIST)||isRegister(buff)!=NOT_EXIST) 
+  {
+    printf("error:line %d: operend cannot be a reserved word!! \n",line);
+    return ERROR;
+  }
     i++;
     while (isspace(buff[i])) {i++;}/**/
     if(buff[i]!='\0')
@@ -238,12 +262,12 @@ int isDirectiveAddressing(char * buff,int line)
         return ERROR;
     }
     /*All tests have been done so word is a labe*/
-    return 1;
+    return VALID;
 }/*end isDirectiveAddressing function */
 
 /*isRegister:
 if is a register it return the index of the register (0-7)
-else it return -2 
+else it return NOT_EXIST 
 */
 int isRegister(char *buf)
 {
@@ -254,7 +278,7 @@ while(isspace(*buf)){buf++;}
 while(buf[i]!='\0' && buf[i]!=' '){i++;}
 if(*buf!='r'|| i!=2)
 {
-    return -2;
+    return NOT_EXIST;
 }
 buf++;
 for(i=0;i<=7;i++)
@@ -264,101 +288,110 @@ for(i=0;i<=7;i++)
      return i;
     }
 }
-     return -2;
+     return NOT_EXIST;
 }
-/*   */
+/*  Matrix addressing  */
 int isMatrix(char *buff,int line,int * r1,int *r2)
 {
-char *label =NULL,*temp =NULL;    
-char openBracket='[',closeBracket=']';
-int openCunter=0,closeCunter=0,i=0,rval;
-while(buff[i]!='\0')
-{
-    if(buff[i]==openBracket)
+    char *label =NULL,*temp =NULL;    
+    char openBracket='[',closeBracket=']';
+    int openCunter=0,closeCunter=0,i=0,rval;
+    while(buff[i]!='\0')
     {
-        openCunter++;
-        if(openCunter==2 &&closeCunter==0)
+        if(buff[i]==openBracket)
         {
-            return ERROR;
-        } 
-    }else if(buff[i]==closeBracket)
-    {
-        closeCunter++;
-        if(closeCunter>openCunter)
+            openCunter++;
+            if(openCunter==2 &&closeCunter==0)
+            {
+                return ERROR;
+            } 
+        }else if(buff[i]==closeBracket)
         {
-            return 0;
-        } 
+            closeCunter++;
+            if(closeCunter>openCunter)
+            {
+                return NOT_EXIST;
+            } 
+        }
+        i++;
     }
-    i++;
-}
-if(closeCunter!=2 ||openCunter !=2)
-{
- return 0;
-}
+    if(closeCunter!=2 ||openCunter !=2)
+    {
+        return NOT_EXIST;
+    }
 /*check the label*/
- while (isspace(*buff)) {buff++;}
- i=0;
- while(buff[i]!=openBracket ||isspace(buff[i])){i++;}
- label=(char *)malloc(sizeof(char)*i);
- if(!label)
- {
-     printf("mermory error !! exit");
-     exit(1);
- }
- strncpy(label,buff,i);
- if(isDirectiveAddressing(label,line)!=1)
- {
-     return 0;/*the lable is un ligal*/
- }
+    while (isspace(*buff)) {buff++;}
+    i=0;
+    while(buff[i]!=openBracket ||isspace(buff[i])){i++;}
+    label=(char *)malloc(sizeof(char)*i);
+    if(!label)
+    {
+        printf("mermory error !! exit");
+        exit(1);
+    }
+    strncpy(label,buff,i);
+    if(isDirectiveAddressing(label,line)!=VALID)
+    {
+        return NOT_EXIST;/*the lable is un ligal*/
+    }
  /*if evgeny need this function TODO;return the label*/
- free(label);
- buff+=i;
-while(isspace(*buff)){buff++;}
-if(*buff!=openBracket)
-{
-    return 0;
-}
-buff++;
-i=0;
-while(buff[i]!=closeBracket){i++;}
-temp=(char*)malloc(sizeof(char)*i);
-strncpy(temp,buff,i);
-rval=isRegister(temp);
-if(rval==-2)
-{
-free(temp);    
-return 0;
-}
-if(r1)
-{
-*r1=rval;
-}
-buff+=i+1;
+    free(label);
+    buff+=i;
+    while(isspace(*buff)){buff++;}
+    if(*buff!=openBracket)
+    {
+        return NOT_EXIST;
+    }
+    buff++;
+    i=0;
+    while(buff[i]!=closeBracket){i++;}
+    temp=(char*)malloc(sizeof(char)*i);
+    strncpy(temp,buff,i);
+    rval=isRegister(temp);
+    if(rval==NOT_EXIST)
+    {
+        free(temp);    
+        return NOT_EXIST;
+    }
+    if(r1)
+    {
+    *r1=rval;
+    }
+    buff+=i+1;
 
-while(isspace(*buff)){buff++;}
-if(*buff!=openBracket)
-{
-    return 0;
-}
-buff++;
-memset(temp,'\0',i);
-i=0;
-while(buff[i]!=closeBracket){i++;}
-strncpy(temp,buff,i);
-rval=isRegister(temp);
-if(rval==-2)
-{
-return 0;
-}
-if(r2)
-{
-*r2=rval;
-}
-buff+=i;
+    while(isspace(*buff)){buff++;}
+    if(*buff!=openBracket)
+    {
+        return NOT_EXIST;
+    }
+    buff++;
+    memset(temp,'\0',i);
+    i=0;
+    while(buff[i]!=closeBracket){i++;}
+    strncpy(temp,buff,i);
+    rval=isRegister(temp);
+    if(rval==NOT_EXIST)
+    {
+        return NOT_EXIST;
+    }
+    if(r2)
+    {
+        *r2=rval;
+    }
+    buff+=i;
 
-return 1;
-}
+    return VALID;
+}/*end of isMatrix*/
 
+/*end of functions for addressing methods */
+/***************************************************/
+
+/* identification get the operends of a action 
+*function and chack if the addressing is currectr
+*and culculate the ic
+*return ERROR if have some error 
+*return TRUE if evrysting is ok
+*/
 int identification(char * buff,int functionIndex,int line,int *ic)
 {
 addressing_method firstOp,secondOp;    
@@ -404,7 +437,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
     if(strcmp("prn",_action[functionIndex].name)==0)
     {
     rval=isImmediateAddressing(buff,line);
-    if(rval==1)
+    if(rval==VALID)
     {
         *ic+=2;
         return 0;  
@@ -414,7 +447,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         }
     }
     rval=isRegister(buff);
-    if(rval!=-2)
+    if(rval!=NOT_EXIST)
     {
         *ic+=2;/*1 for PSW and 1 for the register*/
         return 0;   
@@ -423,7 +456,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         return ERROR;
     }
     rval=isDirectiveAddressing(buff,line);
-    if(rval==1)
+    if(rval==VALID)
     {
         *ic+=2;
         return 0;   
@@ -432,7 +465,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         return ERROR;
     }
     rval=isMatrix(buff,line,NULL,NULL);/*NULL becuse we donte need the regestres*/
-    if(rval==1)
+    if(rval==VALID)
     {
         *ic+=3; /*1 for PSW and 2 for the metrix*/
         return 0;   
@@ -471,7 +504,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         if(rval == ERROR)
         {
             return ERROR;
-        }else if(rval==1)
+        }else if(rval==VALID)
         {
             firstOp=IMMEDIATELY;
         }
@@ -479,18 +512,18 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         {
             rval=isMatrix(tok,line,NULL,NULL);/*NULL becuse we donte need the regestres*/
             if(rval == ERROR){return ERROR;}
-            else if(rval==1){firstOp=MATRIX;}
+            else if(rval==VALID){firstOp=MATRIX;}
         }
        if(firstOp==EMPTY)
         {
             rval=isRegister(tok);
-            if(rval!=-2){firstOp=REG_DIRECT;}
+            if(rval!=NOT_EXIST){firstOp=REG_DIRECT;}
         }
         if(firstOp==EMPTY)
         {
             rval=isDirectiveAddressing(tok,line);
             if(rval == ERROR){return ERROR;}
-            else if(rval==1){firstOp=DIRECT;}
+            else if(rval==VALID){firstOp=DIRECT;}
         }
         if(firstOp==EMPTY)
         {
@@ -508,7 +541,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         if(rval == ERROR)
         {
             return ERROR;
-        }else if(rval==1)
+        }else if(rval==VALID)
         {
             secondOp=IMMEDIATELY;
         }
@@ -516,18 +549,18 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         {
             rval=isMatrix(tok,line,NULL,NULL);/*NULL becuse we donte need the regestres*/
             if(rval == ERROR){return ERROR;}
-            else if(rval==1){secondOp=MATRIX;}
+            else if(rval==VALID){secondOp=MATRIX;}
         }
        if(secondOp==EMPTY)
         {
             rval=isRegister(tok);
-            if(rval!=-2){secondOp=REG_DIRECT;}
+            if(rval!=NOT_EXIST){secondOp=REG_DIRECT;}
         }
         if(secondOp==EMPTY)
         {
             rval=isDirectiveAddressing(tok,line);
             if(rval == ERROR){return ERROR;}
-            else if(rval==1){secondOp=DIRECT;}
+            else if(rval==VALID){secondOp=DIRECT;}
         }
         if(secondOp==EMPTY)
         {
@@ -550,13 +583,15 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         }
     }
 
-    if(secondOp==IMMEDIATELY&&functionIndex!=12&&functionIndex!=1)/*the function is not cmp or prn*/
+    if(secondOp==IMMEDIATELY&&functionIndex!=12&&functionIndex!=VALID)/*the function is not cmp or prn*/
     {
         printf("ERROR:line %d:only cmp or prn can get in the second operend in a IMMEDIATELY METHOD !!",line);
         return ERROR;
     }
 
     /*if we got here the oprends is ligal*/
+
+    /*now calculate the "ic cost"*/
     switch(firstOp)
     {
         case IMMEDIATELY:
@@ -619,5 +654,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
      {
          return 0;
      }
-     return -2;
- }
+     return NOT_EXIST;
+ }/*end of identification*/
+
+ /*end of file*/

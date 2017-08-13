@@ -3,17 +3,18 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
+#include "consts.h"
 int isDirectiveAddressing(char * buff,int line);/*from isSome.c*/
-#define ERROR -1
 int countrChars(char *word, char c,int line);
-/*get numbers from comma list like 2,3,6,4,8,9*/
- int isEmpty(char * buff);
+int isEmpty(char * buff);/*from isSomsing.c*/
 int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc,int line);
-typedef struct commends
-{
-  char *command;
-} commends;
-/* .data 5,2,6,7*/
+
+/*The operator of .data function
+* Enters the data into the dataList
+* and if label!=NULL it enters it to the labelsList
+* return ERROR if have some error 
+  else return TRUE 
+*/
 int dataF(char *command, char *label,int *dc, dataList **dataHead, labelsList **labelsHead,int line)
 {
   int cummaCounter = 0, i = 0, currDc;
@@ -49,15 +50,17 @@ int dataF(char *command, char *label,int *dc, dataList **dataHead, labelsList **
     }
     else
     {
-      return 0;
+      return TRUE;
     }
   }
-  return 0;
+  return TRUE;
 }
-/*
-  HELLO: .string "aviad"
-  "aviad"
-  */
+/*The operator of .srting function
+* Enters the data into the dataList add put in the end 0
+* and if label!=NULL it enters it to the labelsList
+* return ERROR if have some error 
+* else return TRUE 
+*/
 int stringF(char *command, char *label, int *dc, dataList **dataHead, labelsList **labelsHead,int line)
 {
   int currDc = *dc, i;
@@ -116,12 +119,18 @@ int stringF(char *command, char *label, int *dc, dataList **dataHead, labelsList
     }
     else
     {
-      return 0;
+      return TRUE;
     }
   }
-  return 0;
+  return TRUE;
 }
-
+/*The operator of .mat function
+*if declear on data it enters the data into the dataList
+*else it put 0 (row*colume)tims in dataList
+* and if label!=NULL it enters it to the labelsList
+* return ERROR if have some error 
+* else return TRUE 
+*/
 int matF(char *buff,char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line)
 {
 
@@ -147,7 +156,7 @@ while(buff[i]!='\0')
         closeCunter++;
         if(closeCunter>openCunter)
         {
-            return 0;
+            return TRUE;
         } 
     }
     i++;
@@ -261,75 +270,45 @@ printf("error:line %d: in .mat [num1][num2] format\n",line);
     }
     else
     {
-      return 0;
+      return NOT_EXIST;
     }
   }
-  return 0;
+  return NOT_EXIST;
 } /*end of matF function*/
 
+
+/*The operator of .extern function
+* Enters the lebel into the labelsList
+* return ERROR if have some error 
+* else return TRUE 
+*/
 int externF(char *buff,char *label,labelsList **labelsHead,int line)
 {
-  int cunter =0;
   if(!isEmpty(buff))
   {
     printf("Error:line %d: Missing arguments\n",line);
     return ERROR;
   }
-  cunter=countrChars(buff,',',line);
-   if(label)
-          {
-            printf("warnning:line %d:no need lable for .extern function.\n",line);
-          }
-  if(cunter == ERROR)
-    {
-      return ERROR;
-    } 
+  if(label)
+  {
+    printf("warnning:line %d:no need lable for .extern function.\n",line);
+  }
+  if(isDirectiveAddressing(buff,line)==VALID)
+  {
+    addLabel(labelsHead,buff,WAIT,ON,WAIT,0,line);
+  }else
+  {
+    printf("error:line %d: unvalid label for extern function !!\n",line);
+    return ERROR;
+  }    
+  return TRUE;
+}/*end of externF function*/
 
-    if(cunter == 0)
-    {
-      if(isDirectiveAddressing(buff,line)==1)
-      {
-        addLabel(labelsHead,buff,WAIT,ON,WAIT,0,line);
-      }else
-        {
-          printf("error:line %d: unvalid label for extern function !!\n",line);
-          return ERROR;
-        }
-    }else
-    {
-      char *tok;
-      tok=strtok(buff,",");
-      for(;cunter>=0;cunter--)
-    {
-      if(!tok)
-      {
-        printf("error:line %d: un use comma in the end of the line\n",line);
-        return ERROR;
-      }
-      else 
-      {
-        int i=0;
-        while(isspace(tok[i])&&tok[i]!='\0'){i++;}
-        if(tok[i]=='\0')
-        {
-          printf("error:line %d: no data between the commas \n ",line);
-          return ERROR;
-        }
-      }
-       if(isDirectiveAddressing(tok,line)!=1)
-      {
-        addLabel(labelsHead,tok,WAIT,ON,WAIT,0,line);
-      }else
-        {
-          printf("error:line %d: unvalid label for extern function !!\n",line);
-          return ERROR;
-        }
-     tok=strtok(NULL,","); 
-    }
-    return 0;
-    }
-        return 0;
-}
+/*The operator of .entry function
+* Checks the integrity of the declared label
+* return ERROR if have some error 
+* else return TRUE 
+*/
 int entryF(char * buff,char *label,int line)
 {
   int rval;
@@ -346,16 +325,23 @@ int entryF(char * buff,char *label,int line)
  {
   return ERROR;
  }
- else if(rval ==1)
+ else if(rval ==VALID)
  {
- return 1;
+ return TRUE;
  }
- /*rval = 0*/
+ /*rval = NOT_EXIST*/
  printf("error : line %d: unligal label!!\n",line);
  return ERROR;
-}
+}/*end of entryF function*/
 
-
+/*
+An auxiliary function that count how mach time have a
+spesipic char in a char arry 
+Used in matF,dataF,stringF,
+Returns
+Error if there is any error.
+True if there are no errors
+*/
  int countrChars(char *word, char c,int line)
 {
   int counter = 0;
@@ -376,6 +362,14 @@ int entryF(char * buff,char *label,int line)
   } /*end of while*/
   return counter;
 }
+/*
+An auxiliary function that takes a list of numbers
+Separated by a comma and inserted into a datalist
+Used in .mat and .data
+Returns
+Error if there is any error.
+True if there are no errors
+*/
 int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc,int line)
 {
   char *cp;
@@ -401,7 +395,7 @@ int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc,int 
     }else{
         insertData(dataHead, data);
       *dc+=1;
-      return 0;
+      return TRUE;
     }
     
   }
@@ -440,5 +434,5 @@ int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc,int 
     }
     cp = strtok(NULL, ",");
   }
-  return 0;
+  return TRUE;
 }

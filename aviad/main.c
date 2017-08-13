@@ -1,4 +1,6 @@
 #include "struct.h"
+#include <stdio.h>
+#include <stdlib.h>
 int first_run(FILE *fp,labelsList **labelsHead,dataList **dataHead,int *dc,int *ic);
 int main()
 {
