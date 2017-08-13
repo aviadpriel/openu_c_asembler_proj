@@ -290,7 +290,11 @@ for(i=0;i<=7;i++)
 }
      return NOT_EXIST;
 }
-/*  Matrix addressing  */
+/*  Matrix addressing  
+* if r1 and r2 not equal to null
+* it put the row size in r1 and the
+*colume size in r2 
+*/
 int isMatrix(char *buff,int line,int * r1,int *r2)
 {
     char *label =NULL,*temp =NULL;    
