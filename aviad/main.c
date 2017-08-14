@@ -5,6 +5,7 @@ int first_run(FILE *fp,labelsList **labelsHead,dataList **dataHead,int *dc,int *
 int main()
 {
 labelsList *labelsHead=NULL;
+
 dataList *dataHead=NULL;
 int ic=100,dc=0,rval=0;
 FILE *fp;
@@ -22,3 +23,4 @@ freeDataList(dataHead);
 freeLabelsList(labelsHead);
 return 0;
 }
+

@@ -5,38 +5,21 @@
 #define ERROR -1
 #define LABEL_MAX_LEN 30
 
-typedef struct decodeType {
-  char *type;
-  int startBit;
-  int endBit;
-  }decodeType;
-
-
-typedef struct decode {
-  int opcode:4;
-  int orgin:2;
-  int dest:2;
-  int era:2;
-  }decode;
-  typedef struct word {
-    char bit[WORD_SIZE];
-    }word;
 
 typedef enum {ON,OFF,WAIT} SWITCHER;
 typedef struct labelsList {
   char *label;
+SWITCHER entry;
 SWITCHER data;  
 SWITCHER action;
 SWITCHER external;
 int address;
 struct labelsList *next;
 } labelsList;
-
 typedef struct dataList{
 int data:WORD_SIZE;
 struct dataList *next;
 }dataList;
-
 typedef struct commandList{
 char *name;  
 int operends;
@@ -54,7 +37,7 @@ dataList* newData(int data)
     printf("mermory alloction error\n");
     exit(1);
   }
-  p->data=data;
+  p->data = data;
   p->next=NULL;
   return p;
 }
@@ -79,7 +62,7 @@ void insertData(dataList **dataHead,int data)
 
 
 /************labelsList functions*******/
-labelsList* newLabel(char *label,int address,SWITCHER action,SWITCHER external,SWITCHER data)
+labelsList* newLabel(char *label,int address,SWITCHER action,SWITCHER external,SWITCHER data,SWITCHER entry)
 {
   labelsList *p = (labelsList*)malloc(sizeof(labelsList));
   if (!p) {
@@ -92,12 +75,12 @@ labelsList* newLabel(char *label,int address,SWITCHER action,SWITCHER external,S
   p->external=external;
   p->address=address;
   p->data=data;
+  p->entry=entry;
   p->next =NULL;
   return p;
 }
 
-int addLabel(labelsList **labelsHead, char *label,SWITCHER action,SWITCHER external,
-  SWITCHER data,int address,int line)
+int addLabel(labelsList **labelsHead,char *label,SWITCHER action,SWITCHER external,SWITCHER data,SWITCHER entry,int address,int line)
 {
 /* insert using a loop and pointer to pointer*/
   while(*labelsHead)
@@ -110,7 +93,7 @@ int addLabel(labelsList **labelsHead, char *label,SWITCHER action,SWITCHER exter
       return ERROR;
     }
   }
-  *labelsHead = newLabel(label,address,action,external,data);
+  *labelsHead = newLabel(label,address,action,external,data,entry);
   return 1;
 }
 
@@ -136,17 +119,3 @@ void freeLabelsList(labelsList *labelsHead)
         free(temp);
     }
 }
-
-/*
-void setBits(word * output,int val)
-{
-  int i,k,start,end;
-  start =0;
-  end=9;
-  k=val;
-  for(i=start;i<=end;i++,k/=2)
-  {
-    output->bit[i]=k%2;
-  }
-  
-}*/

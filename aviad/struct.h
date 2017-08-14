@@ -5,19 +5,22 @@
 #define SWITCHER_1
 typedef enum {ON,OFF,WAIT} SWITCHER;
 #endif
+
 #ifndef LABELS_LIST_1
 #define LABELS_LIST_1
+
 typedef struct labelsList {
   char *label;
-SWITCHER data;
+SWITCHER entry;
+SWITCHER data;  
 SWITCHER action;
 SWITCHER external;
 int address;
 struct labelsList *next;
 } labelsList;
 
-int addLabel(labelsList **labelsHead, char *label,SWITCHER action,SWITCHER external,
- SWITCHER data, int address,int line);
+int addLabel(labelsList **labelsHead,char *label,SWITCHER action,SWITCHER external,SWITCHER data,SWITCHER entry,int address,int line);
+
 void freeLabelsList(labelsList *labelsHead);
 #endif
 #ifndef DATA_LIST_1

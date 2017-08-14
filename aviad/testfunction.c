@@ -43,7 +43,7 @@ int dataF(char *command, char *label,int *dc, dataList **dataHead, labelsList **
     return ERROR;
   if (label)
   {
-    int num = addLabel(labelsHead,label,OFF,OFF,ON,currDc,line);
+    int num = addLabel(labelsHead,label,OFF,OFF,ON,OFF,currDc,line);
     if (!num)
     {
       return ERROR;
@@ -112,7 +112,7 @@ int stringF(char *command, char *label, int *dc, dataList **dataHead, labelsList
   /*add label if exzist one */
   if (label)
   {
-    int num = addLabel(labelsHead, label, OFF, OFF,ON,currDc,line);
+    int num = addLabel(labelsHead, label, OFF, OFF,ON,OFF,currDc,line);
     if (!num)
     {
       return ERROR;
@@ -263,7 +263,7 @@ printf("error:line %d: in .mat [num1][num2] format\n",line);
   /*add label if exzist one */
   if (label)
   {
-    int num = addLabel(labelsHead, label, OFF, OFF,ON,currDc,line);
+    int num = addLabel(labelsHead,label,OFF,OFF,ON,OFF,currDc,line);
     if (!num)
     {
       return ERROR;
@@ -295,7 +295,7 @@ int externF(char *buff,char *label,labelsList **labelsHead,int line)
   }
   if(isDirectiveAddressing(buff,line)==VALID)
   {
-    addLabel(labelsHead,buff,WAIT,ON,WAIT,0,line);
+    addLabel(labelsHead,buff,WAIT,ON,WAIT,OFF,0,line);
   }else
   {
     printf("error:line %d: unvalid label for extern function !!\n",line);

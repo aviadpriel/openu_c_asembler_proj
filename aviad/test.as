@@ -6,8 +6,6 @@ LOOP:   jmp END
         sub r1,r4
         inc K
         mov M1[r3][r3],r3
-        bne LOOP
-END:    sto
 STR:    .string "ab  cdef"
 K:      .data   22,1,2,3,43,99
-M1:     .mat  [2][2]  1
+M1:     .mat  [2][2]  

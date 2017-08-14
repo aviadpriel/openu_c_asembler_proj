@@ -162,7 +162,7 @@ int first_run(FILE *fp,labelsList **labelsHead,dataList **dataHead,int *dc,int *
 		      errorFlag=ON;
 	    }else if(label)
       {
-        if(addLabel(labelsHead,label,ON,OFF,OFF,curIc,lineCounter)==ERROR)
+        if(addLabel(labelsHead,label,ON,OFF,OFF,OFF,curIc,lineCounter)==ERROR)        
           		errorFlag=ON;
       }
     }
