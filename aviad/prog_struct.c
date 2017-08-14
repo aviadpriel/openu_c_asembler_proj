@@ -23,6 +23,7 @@ typedef struct psw
   int op1:2;
   int op2:2;
   int opcode:4;
+  int [][10];
 }psw;
 typedef struct decode
 {
