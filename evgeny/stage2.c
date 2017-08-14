@@ -17,18 +17,18 @@ This is stage2 file
 stage2(FILE *file, data *data_head, lableList *label_head,codeList *code_head)
 {
     int ic = 0;
-    lableList *curr= NULL;
-    char *field, label[30];
+    char *field, label[30];//magic number here
+
     while(fgets(line, LINE_LEN, file))
     {
-        if(is_label(field = next_field(line, field), label_head, curr))
+        if(is_label(field = next_field(line), label_head))
             field = next_field(line);
-        if(is_directing(field, curr))
-            continue;
+        if(is_directing(field)
+                continue;
         //קידוד אופרנדים סעיף 7 במעבר שני.
 
     }
-    if(errors, STAGE2)
+    if(errors, STAGE2)/*found errors*/
     {
         output(errors, STAGE2);// STAGE2 is enum for error type.
         return -1 //magic number
