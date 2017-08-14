@@ -22,6 +22,7 @@ stage2(FILE *file, data *data_head, lableList *label_head,codeList *code_head)
     while(fgets(line, LINE_LEN, file))
     {
         if(is_label(field = next_field(line), label_head))
+            if()
             field = next_field(line);
         if(is_directing(field)
                 continue;
@@ -59,15 +60,23 @@ int is_directing(char *field, char *label)
 	*Return: true (0) if found else false (non zero).
 	*Description: checks if the field is label and declared.
 ****************************************************************************************************************************************************/
-int is_label(char *field, labelList *head, labelList curr)
+int is_label(char *field, labelList *head)
 {
-    curr = head;
-    field[strlen(field) - 1] = '\0'; /*exclude ':' of label*/
-    while(curr != NULL)
+    labelList *curr = head;
+    if(field[strlen(field - 1)] == ':')/*field is label*/
     {
-        if(strcmp(curr.name, field))
-            return true;/*true == 0*/
-        curr = curr.next;
+        field[strlen(field) - 1] = '\0'; /*exclude ':' of label*/
+        while(curr != NULL)
+        {
+            if(strcmp(curr.name, field))
+              return true;/*true == 1*/
+            else if(!curr)
+            {
+                printf("label \"%s\" does not exist", field);
+                return NOT_EXIST;
+            }
+            curr = curr.next;
+        }
     }
-    return false;
+    return false;//false == 0
 }/*is_label*/
