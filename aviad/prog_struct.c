@@ -17,14 +17,10 @@ typedef struct labelsList {#include <stdlib.h>
 
 typedef enum {ON,OFF,WAIT} SWITCHER;
 
-typedef struct psw
+typedef struct word 
 {
-  int era:2;
-  int op1:2;
-  int op2:2;
-  int opcode:4;
-  int [][10];
-}psw;
+char wordbase[10];
+}word;
 typedef struct decode
 {
     psw PSW;
@@ -41,7 +37,7 @@ struct labelsList *next;
 } labelsList;
 
 typedef struct dataList{
-int data:WORD_SIZE;
+word data;
 struct dataList *next;
 }dataList;
 typedef struct commandList{
@@ -252,4 +248,9 @@ void freeLabelsList(labelsList *labelsHead)
         labelsHead = labelsHead->next;
         free(temp);
     }
+}
+
+void decodeF()
+{
+  
 }
