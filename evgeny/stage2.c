@@ -16,16 +16,27 @@ This is stage2 file
 ****************************************************************************************************************************************************/
 stage2(FILE *file, data *data_head, lableList *label_head,codeList *code_head)
 {
-    int ic = 0;
+    int ic = 0;//ic needs to be initialized to the begining (not always 0)
     char *field, label[30];//magic number here
 
     while(fgets(line, LINE_LEN, file))
     {
-        if(is_label(field = next_field(line), label_head))
-            if()
-            field = next_field(line);
+        switch(is_label(field = next_field(line), label_head))
+        {
+            case true: 
+                field = next_field(line);
+                break;
+            case false:
+                break;
+            default:
+                printf("line %d: label \"%s\" does not exist\n",/*line index here*/, field);//missing line indicator
+                break;
+        }
         if(is_directing(field)
-                continue;
+        {
+            //switch label flag is_entry to on
+            continue;
+        }
         //קידוד אופרנדים סעיף 7 במעבר שני.
 
     }
@@ -38,7 +49,7 @@ stage2(FILE *file, data *data_head, lableList *label_head,codeList *code_head)
     return 0;
 }/*stage2*/
 
-int is_directing(char *field, char *label)
+int is_directing(char *field)
 {
     if(field != '.')
         return false;
@@ -57,7 +68,7 @@ int is_directing(char *field, char *label)
 /****************************************************************************************************************************************************
 	*Function: is_label
 	*Input: char field- next word of current line, labelList *head- pointer to lableList head.
-	*Return: true (0) if found else false (non zero).
+	*Return: true (1) if found, false (0) if not a label, NOT_EXIST (-2) if label wasn't declared.
 	*Description: checks if the field is label and declared.
 ****************************************************************************************************************************************************/
 int is_label(char *field, labelList *head)
@@ -71,10 +82,7 @@ int is_label(char *field, labelList *head)
             if(strcmp(curr.name, field))
               return true;/*true == 1*/
             else if(!curr)
-            {
-                printf("label \"%s\" does not exist", field);
                 return NOT_EXIST;
-            }
             curr = curr.next;
         }
     }
