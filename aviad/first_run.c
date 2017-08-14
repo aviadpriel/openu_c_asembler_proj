@@ -40,6 +40,7 @@ int stringF(char *command,char *label,int *dc,dataList **dataHead,labelsList **l
 int matF(char *command,char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line);
 int externF(char *buff,char *label,labelsList **labelsHead,int line);
 int entryF(char * buff,char *label,int line);
+void updateDataLabel(labelsList **labelsHead,int curIc);
 
 char * isLabel(char * buf,int *error,int line);
 
@@ -183,8 +184,20 @@ if(*dc==0 && *ic==INIT_IC)/*chack if is no a empty file */
   } 
   else if(errorFlag== OFF)
   {
+    updateDataLabel(labelsHead,*ic);
 	  return TRUE;  
   }
   return ERROR;
 }
 
+void updateDataLabel(labelsList **labelsHead,int curIc)
+{
+  while(*labelsHead)
+  {
+    if((*labelsHead)->data==ON)
+    {
+      (*labelsHead)->address+=curIc;
+    }
+    labelsHead = &( (*labelsHead)->next);    
+  }
+}
