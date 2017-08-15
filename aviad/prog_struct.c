@@ -7,6 +7,19 @@
 
 
 typedef enum {ON,OFF,WAIT} SWITCHER;
+typedef struct bitType{
+
+  char * type;
+  int startBit;
+  int endBit;
+}bitType;
+
+typedef struct binWord{
+  int opcode:4;
+  int orgin:2;
+  int dest:2;
+  int era:2;
+  }binWord; 
 typedef struct labelsList {
   char *label;
 SWITCHER entry;
@@ -119,3 +132,4 @@ void freeLabelsList(labelsList *labelsHead)
         free(temp);
     }
 }
+
