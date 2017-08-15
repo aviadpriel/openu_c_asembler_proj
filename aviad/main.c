@@ -31,8 +31,9 @@ void setBitsAddresOrImmediate(binWord * word,int data);
 int binWordToInt(binWord *word);
 void binWordToStrangeBase(binWord *word);
 /***************************/
+void updateEntry(char *label,labelsList **labelsHead);
 int main()
-{
+{/*
     int word=0;
 binWord test;
 test.era=test.dest=test.orgin=test.opcode=0;
@@ -53,7 +54,7 @@ printf("word in int is %d \n",word);
 binWordToStrangeBase(&test);
 return 0;
     
-    /*
+    */
 labelsList *labelsHead=NULL;
 
 dataList *dataHead=NULL;
@@ -68,10 +69,11 @@ exit(1);
 
 
 rval=first_run(fp,&labelsHead,&dataHead,&dc,&ic); 
-printf("ic is :%d \n dc is :%d \n rval is :%d \n",ic,dc,rval);   
+printf("ic is :%d \n dc is :%d \n rval is :%d \n",ic,dc,rval);
+updateEntry("    aviasd",&labelsHead);   
 freeDataList(dataHead);
 freeLabelsList(labelsHead);
-return 0; */
+return 0; 
 }
 int setBits(int data,char * type,binWord * word,int line)
 {

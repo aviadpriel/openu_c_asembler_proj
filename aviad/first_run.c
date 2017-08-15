@@ -62,7 +62,7 @@ int first_run(FILE *fp,labelsList **labelsHead,dataList **dataHead,int *dc,int *
   while(fgets( line, LINE_LENGTH,fp))
   {
 
-    int error =TRUE,functionIndex;
+    int error =0,functionIndex;
     char *buff;
     char *label;
     buff=strtok(line," ");
@@ -92,7 +92,7 @@ int first_run(FILE *fp,labelsList **labelsHead,dataList **dataHead,int *dc,int *
       continue;/*no need to do the other tests*/
       }
     }
-    if((functionIndex =isDirective(buff))!=-2)/*the function is directive stetment*/
+    if((functionIndex =isDirective(buff))!=NOT_EXIST)/*the function is directive stetment*/
     {
       SWITCHER matrixF=OFF;
       char *temp=NULL;
