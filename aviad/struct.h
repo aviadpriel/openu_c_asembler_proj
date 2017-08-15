@@ -36,11 +36,14 @@ void freeDataList(dataList *dataHead);
 
 #ifndef COMMAND_LIST_1
 #define COMMAND_LIST_1
+
 typedef struct commandList{
-char *name;  
-int operends;
-int operendGroup;
-}commandList;
+  char *name;  
+  int operends;
+  int firstOperendGroup;
+  int secondOperendGroup;
+  }commandList;
+
 #endif
 
 #ifndef BIN_WORD_1
@@ -53,6 +56,11 @@ typedef struct binWord{
   unsigned int era:2;
    }binWord;
   
+   typedef struct binWordList{
+    binWord word;
+    struct binWordList *next;
+}binWordList;
+
 #endif
 
 

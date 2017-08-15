@@ -21,6 +21,12 @@ typedef struct binWord{
   int dest:2;
   int era:2;
   }binWord; 
+
+  typedef struct binWordList{
+    binWord word;
+    struct binWordList *next;
+}binWordList;
+
 typedef struct labelsList {
   char *label;
 SWITCHER entry;
@@ -161,4 +167,35 @@ int updateEntry(char *label,labelsList **labelsHead,int line)
     return ERROR;
   }
 return 0;
-}            
+}
+
+binWordList* newBinWord(binWord word)
+{
+  binWordList *p = (binWordList*)malloc(sizeof(binWordList));
+  if (!p) {
+    printf("memmory error exit\n");
+    exit(1);
+  }
+  p->word.opcode=word.opcode;
+  p->word.orgin=word.orgin;
+  p->word.dest=word.dest;
+  p->word.era=word.era;
+  p->next=NULL;
+  return p;
+}
+void addBinWord(binWordList **binWordHead,binWord word)
+{
+  while(*binWordHead)
+  {
+    binWordHead = &( (*binWordHead)->next);
+  }
+*binWordHead = newBinWord(word);
+}
+void catBinWordList(binWordList **binWordHead,binWordList **binWordBuff)
+{
+  while(*binWordHead)
+  {
+    binWordHead = &( (*binWordHead)->next);
+  }
+  *binWordHead=*binWordBuff;
+}
