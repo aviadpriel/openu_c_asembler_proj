@@ -13,7 +13,7 @@ enum symbol_flag {}
 *****************************************************************************************************************************************************/
 typedef struct machine_code_node
 {
-    char psw[WORD_SIZE];/*assemblers base line*/
+    binWord word;/*assemblers base line*/
     machine_code *next;/*pointer to next assemblers base line*/
     binWord *nextDown;/*pointer to next word (if needed) related to this psw */
     int commandLineCnt;/*number line of the original file line*/
