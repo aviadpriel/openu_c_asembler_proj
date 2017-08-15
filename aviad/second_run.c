@@ -41,7 +41,7 @@ static commandList _action[]={{"mov",2,4,3},
 {"stop",0,0,0},
 {NULL,0,0,0}};
 
-int second_run(FILE *fp,labelsList **labelsHead,dataList **dataHead)
+int second_run(FILE *fp,labelsList **labelsHead,dataList **dataHead, char *file_name)
 {
     binWordList *binWordHead;
     SWITCHER errorFlag = OFF; /*errorFlag check if we can to go to second_run */
