@@ -4,12 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-typedef struct binWord{
-   unsigned int opcode:4;
-   unsigned int orgin:2;
-   unsigned int dest:2;
-   unsigned int era:2;
-    }binWord;
+
 typedef struct bitType{
     char * type;
     int startBit;
@@ -20,7 +15,7 @@ typedef struct bitType{
     {"char",0,9},
     {"orgin",4,5},
     {"destin",2,3},
-    {"are",0,1},
+    {"era",0,1},
     {"addres",2,9},
     {"immediate",2,9},
     {"opcode",6,9},    
@@ -31,13 +26,31 @@ typedef struct bitType{
 int first_run(FILE *fp,labelsList **labelsHead,dataList **dataHead,int *dc,int *ic);
 /***************/
 int decodeData(binWord * word,int data,int line);
+int setBits(int data,char * type,binWord * word,int line);
 void setBitsAddresOrImmediate(binWord * word,int data);
+int binWordToInt(binWord *word);
+void binWordToStrangeBase(binWord *word);
 /***************************/
 int main()
 {
+    int word=0;
 binWord test;
-test.opcode=-2;
-printf(" test.opcode = %d test.orgin = %d \n",test.opcode ,test.orgin);
+test.era=test.dest=test.orgin=test.opcode=0;
+setBits(0,"era",&test,0);
+setBits(3,"destin",&test,0);
+setBits(3,"orgin",&test,0);
+setBits(2,"opcode",&test,0);
+
+printf(" test.opcode = %d \n test.orgin = %d \n test.dest = %d \n test.era = %d \n",test.opcode ,test.orgin,test.dest,test.era);
+word|=test.opcode;
+word<<=2;
+word|=test.orgin;
+word<<=2;
+word|=test.dest;
+word<<=2;
+word|=test.era;
+printf("word in int is %d \n",word);
+binWordToStrangeBase(&test);
 return 0;
     
     /*
@@ -173,4 +186,32 @@ void setBitsAddresOrImmediate(binWord * word,int data)
     word->opcode=data&mask4Bits;
 }
 
+int binWordToInt(binWord *word)
+{
+    int intNum=0;
+    intNum|=word->opcode;
+    intNum<<=2;
+    intNum|=word->orgin;
+    intNum<<=2;
+    intNum|=word->dest;
+    intNum<<=2;
+    intNum|=word->era;
+    return intNum;
+}
+void binWordToStrangeBase(binWord *word)
+{
+    int temp=0;
+    char *base4 ={"ABCD"};
+    char a[5]={"\0"};
+    temp=word->opcode;
+    temp>>=2;
+    a[0]=base4[temp];
+    temp=word->opcode;
+    temp&=3;
+    a[1]=base4[temp];
+    a[2]=base4[word->orgin];
+    a[3]=base4[word->dest];
+    a[4]=base4[word->era];
+    printf("%s  !!!\n",a);
+}
 

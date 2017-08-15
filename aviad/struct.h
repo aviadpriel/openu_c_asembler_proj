@@ -43,6 +43,16 @@ int operendGroup;
 }commandList;
 #endif
 
+#ifndef BIN_WORD_1
+#define BIN_WORD_1
 
+typedef struct binWord{
+  unsigned int opcode:4;
+  unsigned int orgin:2;
+  unsigned int dest:2;
+  unsigned int era:2;
+   }binWord;
+  
+#endif
 
 
