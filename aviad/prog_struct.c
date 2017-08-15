@@ -1,6 +1,7 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include<ctype.h>
 #define WORD_SIZE 10
 #define ERROR -1
 #define LABEL_MAX_LEN 30
@@ -133,3 +134,31 @@ void freeLabelsList(labelsList *labelsHead)
     }
 }
 
+int updateEntry(char *label,labelsList **labelsHead,int line)
+{
+  SWITCHER entryFlag=OFF;
+  int i=0,functionLen;
+  while(isspace(*label)){label++;}
+  while(!isspace(label[i])&&label[i]!='\0'){i++;}
+  functionLen = i;
+  /* insert using a loop and pointer to pointer*/
+  while(*labelsHead)
+  {
+    if(strncmp(label,(*labelsHead)->label,strlen((*labelsHead)->label))==0)/*need to update the entry flag */
+    {
+      if(functionLen==strlen((*labelsHead)->label))
+      {
+      (*labelsHead)->entry=ON;
+      entryFlag=ON;
+      }
+    }
+    labelsHead = &( (*labelsHead)->next);    
+  }
+  /*chack if the label is declear in the file */
+  if(entryFlag==OFF)
+  {
+    printf("error:line %d:the label ( %s ) is not decleared in the file\n",line,label);
+    return ERROR;
+  }
+return 0;
+}            
