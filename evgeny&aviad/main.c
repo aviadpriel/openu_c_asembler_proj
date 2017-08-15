@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
         printf("No arguments were given");
         exit(1);
     }
-    /*every new loop run is a different file.as*/
+    /*every new loop runs is a different file.as*/
     for(i = 1; i < argc; i++)
     {
         modify_name(file_name,(strlen(argv[i]) + LINE_ARG_SUFFIX),argv[i]);
