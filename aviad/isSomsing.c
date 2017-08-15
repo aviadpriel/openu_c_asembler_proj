@@ -210,7 +210,7 @@ int isImmediateAddressing(char * buff,int line)
     char *rest;
     char asterisk='#';
     while(isspace(*buff)){buff++;}
-    if(*buff!=asterisk){return TRUE;}/*is not a immediate addressing */
+    if(*buff!=asterisk){return 0;}/*is not a immediate addressing */
     buff++;/*skip the asterisk */
     if ((!isdigit(*buff))&&(*buff!='-')&&(*buff!='+'))
     {
@@ -376,6 +376,7 @@ int isMatrix(char *buff,int line,int * r1,int *r2)
     rval=isRegister(temp);
     if(rval==NOT_EXIST)
     {
+
         return NOT_EXIST;
     }
     if(r2)
