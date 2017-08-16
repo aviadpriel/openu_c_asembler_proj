@@ -198,7 +198,7 @@ int binWordToInt(binWord *word)
 void binWordToStrangeBase(binWord *addressWord,binWord *dataWord)
 {
     int intAddress=0,intData=0;
-    char *base4 ={"ABCD"};
+    char *base4 ={"abcd"};
     char address[5]={"\0"};
     char data[6]={"\0"};    
    

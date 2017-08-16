@@ -1,0 +1,225 @@
+isSomsing.c
+
+/*chack if the line is a comment
+returns
+if is comment TRUE
+else NOT_EXIST 
+*/
+int isComment(char * buff)
+
+/*get a word and chack if is a name of
+* directive function
+*if is a name of directive function
+*return the index of the function (0-4)
+*else return NOT_EXIST
+*/
+int isDirective(char *command)
+
+/*get a word and chack if is a name of
+* action function
+*if is a name of action function
+*return the index of the function (0-15)
+*else return NOT_EXIST
+*/
+int isAction(char *command)
+
+/*This function is designed to check a new label at the beginning of a line
+*it return a the label in char *
+*else it return NULL (if is not label or have some error)
+* also if have some error it put in (int *error) ERROR 
+*/
+char * isLabel(char *buf,int *error,int line)
+
+/************************************************/
+/*functions for Addressing methods
+
+get a operend of action function
+end
+return ERROR if have some error
+else
+return VALID if is the Addressing method
+else
+return NOT_EXIST if is not the Addressing method
+*/
+
+/*immediate addressing*/
+int isImmediateAddressing(char * buff,int line)
+
+/*directive addressing*/
+int isDirectiveAddressing(char * buff,int line)
+
+/*isRegister:
+if is a register it return the index of the register (0-7)
+else it return NOT_EXIST 
+*/
+int isRegister(char *buf)
+
+*  Matrix addressing  
+* if r1 and r2 not equal to null
+* it put the row size in r1 and the
+*colume size in r2 
+*/
+int isMatrix(char *buff,int line,int * r1,int *r2)
+
+/*end of functions for addressing methods */
+/***************************************************/
+
+!!!!old function!!!!
+
+/* identification get the operends of a action 
+*function and chack if the addressing is currectr
+*and culculate the ic
+*return ERROR if have some error 
+*return TRUE if evrysting is ok
+*/
+int identification(char * buff,int functionIndex,int line,int *ic)
+
+/*chack if is a empy line/word*/
+ int isEmpty(char * buff)
+
+/*************************************************************/
+
+testFunctions.c
+
+
+*The operator of .data function
+* Enters the data into the dataList
+* and if label!=NULL it enters it to the labelsList
+* return ERROR if have some error 
+  else return TRUE 
+*/
+int dataF(char *command, char *label,int *dc, dataList **dataHead, labelsList **labelsHead,int line)
+
+/*The operator of .srting function
+* Enters the data into the dataList add put in the end 0
+* and if label!=NULL it enters it to the labelsList
+* return ERROR if have some error 
+* else return TRUE 
+*/
+int stringF(char *command, char *label, int *dc, dataList **dataHead, labelsList **labelsHead,int line)
+
+
+/*The operator of .mat function
+*if declear on data it enters the data into the dataList
+*else it put 0 (row*colume)tims in dataList
+* and if label!=NULL it enters it to the labelsList
+* return ERROR if have some error 
+* else return TRUE 
+*/
+int matF(char *buff,char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line)
+
+/*The operator of .extern function
+* Enters the lebel into the labelsList
+* return ERROR if have some error 
+* else return TRUE 
+*/
+int externF(char *buff,char *label,labelsList **labelsHead,int line)
+
+/*The operator of .entry function
+* Checks the integrity of the declared label
+* return ERROR if have some error 
+* else return TRUE 
+*/
+int entryF(char * buff,char *label,int line)
+
+/*
+An auxiliary function that count how mach time have a
+spesipic char in a char arry 
+Used in matF,dataF,stringF,
+Returns
+Error if there is any error.
+True if there are no errors
+*/
+ int countrChars(char *word, char c,int line)
+
+/*
+An auxiliary function that takes a list of numbers
+Separated by a comma and inserted into a datalist
+Used in .mat and .data
+Returns
+Error if there is any error.
+True if there are no errors
+*/
+int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc,int line)
+
+/**********************************************/
+
+first_run.c
+
+pasado-code of function first_run
+1. If a null is returned, go to 8
+2. If it is an empty row or a note line, return to 1
+3. Take a word from the line
+4. If it is a label save it and go to the next word
+5. If this is the directive function, do related actions to the directive function and return to 1
+6. If this is an action function, do related actions to the action function and return to 1
+7. An error message has been sent: Unrecognized / valid expression, return to 1
+8. If an error has occurred so far, return ERROR another return 0
+
+Discounts
+1. The maximum length of the line is 80
+
+Remarks
+1. The tests of the guidance functions are performed in the DirectiveTest.c
+  2. Tests of the actions functions are performed in 
+3. Related operations = (in the health + housing + assignment in data structures + calculation of ic / dc)
+*/
+int first_run(FILE *fp,labelsList **labelsHead,dataList **dataHead,int *dc,int *ic)
+
+void updateDataLabel(labelsList **labelsHead,int curIc)
+
+void updateDataList(dataList **dataHead,int curIc)
+
+
+second_run.c
+
+int second_run(FILE *fp,labelsList **labelsHead,dataList **dataHead, char *file_name)
+
+/*new!!!!!*/
+int identifications(char * buff,int functionIndex,int line,int *ic,SWITCHER secondRun,binWordList **binWordHead,labelsList **labelsHead)
+
+ int isInTheList(char *label,labelsList **labelsHead,int line,int *externalFlag)
+
+void initWord(binWord *word)
+
+void printAndfree(binWordList *binWordHead)
+
+void printAndfreeData(dataList *dataHead)
+
+
+/*****************************************************************/
+
+prog_struct.c
+
+dataList* newData(int data,int address)
+
+void insertData(dataList **dataHead,int data,int address)
+
+labelsList* newLabel(char *label,int address,SWITCHER action,SWITCHER external,SWITCHER data,SWITCHER entry)
+
+int addLabel(labelsList **labelsHead,char *label,SWITCHER action,SWITCHER external,SWITCHER data,SWITCHER entry,int address,int line)
+
+void freeDataList(dataList *dataHead)
+
+void freeLabelsList(labelsList *labelsHead)
+
+int updateEntry(char *label,labelsList **labelsHead,int line)
+
+binWordList* newBinWord(binWord word,int address)
+
+void addBinWord(binWordList **binWordHead,binWord *word,int address)
+
+void catBinWordList(binWordList **binWordHead,binWordList **binWordBuff,int curIC)
+/*************************************************************************************************/
+
+main.c
+
+int setBits(int data,char * type,binWord * word,int line)
+
+int decodeData(binWord * word,int data,int line)
+
+void setBitsAddresOrImmediate(binWord * word,int data)
+
+int binWordToInt(binWord *word)
+
+void binWordToStrangeBase(binWord *addressWord,binWord *dataWord)

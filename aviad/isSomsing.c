@@ -343,7 +343,6 @@ int isMatrix(char *buff,int line,int * r1,int *r2)
     {
         return NOT_EXIST;/*the lable is un ligal*/
     }
- /*if evgeny need this function TODO;return the label*/
     free(label);
     buff+=i;
     while(isspace(*buff)){buff++;}
@@ -652,6 +651,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
     }
     return ERROR;
 }
+
  int isEmpty(char * buff)
  {
     int i=0;
