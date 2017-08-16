@@ -17,9 +17,13 @@ int isDirectiveAddressing(char * buff, int line);
 int isMatrix(char *buff,int line,int *r1,int *r2);
 int setBits(int data,char * type,binWord * word,int line);
 int updateEntry(char *label,labelsList **labelsHead,int line);
-int isInTheList(char *label,labelsList **labelsHead,int line);
+int isInTheList(char *label,labelsList **labelsHead,int line,int *externalFlag);
 void initWord(binWord *word);
-void addBinWord(binWordList **binWordHead,binWord word);
+int binWordToInt(binWord *word);
+void addBinWord(binWordList **binWordHead,binWord *word,int address);
+void binWordToStrangeBase(binWord *addressWord,binWord *dataWord);
+void printAndfree(binWordList *binWordHead);
+void printAndfreeData(dataList *dataHead);
 char * isLabel(char * buf,int *error,int line);
 int identifications(char * buff,int functionIndex,int line,int *ic,SWITCHER secondRun,binWordList **binWordHead,labelsList **labelsHead);
 
@@ -49,6 +53,7 @@ int second_run(FILE *fp,labelsList **labelsHead,dataList **dataHead, char *file_
     int lineCounter=1,ic2=INIT_IC;
     /*for print errors*/
     /*Confirming the cursor to the beginning of the file*/
+    binWordHead=NULL;
     fseek(fp,0,SEEK_SET);
     line=(char *)malloc(sizeof(char)*LINE_LENGTH);
     if(!line)
@@ -99,6 +104,8 @@ int second_run(FILE *fp,labelsList **labelsHead,dataList **dataHead, char *file_
     {
         return ERROR;
     }
+   /* printAndfree(binWordHead)*/;
+    printAndfreeData(*dataHead);
     return 0;
 }
 /*pasdo-code for crazy decodeAction
@@ -114,7 +121,7 @@ int identifications(char * buff,int functionIndex,int line,int *ic,SWITCHER seco
 {    
 binWord word;
 addressing_method firstOp,secondOp;    
-int firstCost=0,secondCost=0,rval=0,r1=0,r2=0;
+int firstCost=0,secondCost=0,rval=0,r1=0,r2=0,externalFlag=0;
 int cammaCounter;
 /*for second run*/
 initWord(&word);
@@ -140,7 +147,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
     setBits(0,"orgin",&word,line);
     setBits(0,"destin",&word,line);
     setBits(0,"era",&word,line);
-    addBinWord(binWordHead,word);
+    addBinWord(binWordHead,&word,*ic);
     return 0;    
     }
     if(buff==NULL)
@@ -187,8 +194,8 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                 if(setBits(intData,"immediate",&data,line)==ERROR)
                    { return ERROR;}
 
-                addBinWord(binWordHead,word);
-                addBinWord(binWordHead,data);                  
+                addBinWord(binWordHead,&word,*ic);
+                addBinWord(binWordHead,&data,(*ic)+1);                  
             }
             *ic+=2;
             return 0; 
@@ -204,14 +211,13 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         {
             /*decode the register !!*/
             binWord regWord;
-            regWord.opcode=regWord.orgin=regWord.dest=regWord.era=0;            
-            
+            initWord(&regWord);            
             setBits(functionIndex,"opcode",&word,line);
-            setBits(1,"destin",&word,line);
+            setBits(3,"destin",&word,line);
             /*make word for the register*/
-            setBits(rval,"addres",&regWord,line);            
-            addBinWord(binWordHead,word);
-            addBinWord(binWordHead,regWord); 
+            setBits(rval,"opcode",&regWord,line);            
+            addBinWord(binWordHead,&word,*ic);
+            addBinWord(binWordHead,&regWord,(*ic)+1); 
         }
         *ic+=2;/*1 for PSW and 1 for the register*/
         return 0;   
@@ -227,16 +233,23 @@ if(_action[functionIndex].operends==0)/*if no operends*/
             binWord labelWord;
             int address;            
             initWord(&labelWord);
-            if((address=isInTheList(buff,labelsHead,line))==ERROR)
+            if((address=isInTheList(buff,labelsHead,line,&externalFlag))==ERROR)
                 return ERROR;
             
             setBits(functionIndex,"opcode",&word,line);
-            setBits(3,"destin",&word,line);
+            setBits(1,"destin",&word,line);
             /*make word for the label*/
             setBits(address,"addres",&labelWord,line);
-            setBits(2,"era",&labelWord,line);                        
-            addBinWord(binWordHead,word);
-            addBinWord(binWordHead,labelWord); 
+            if(externalFlag)
+            {
+                setBits(1,"era",&labelWord,line);                
+            }
+            else
+            {
+                setBits(2,"era",&labelWord,line);
+            }                        
+            addBinWord(binWordHead,&word,*ic);
+            addBinWord(binWordHead,&labelWord,(*ic)+1); 
         }
         *ic+=2;
         return 0;   
@@ -254,21 +267,28 @@ if(_action[functionIndex].operends==0)/*if no operends*/
             initWord(&labelMetrix);
             initWord(&regMetrix);
  
-            if((address=isInTheList(buff,labelsHead,line))==ERROR)
+            if((address=isInTheList(buff,labelsHead,line,&externalFlag))==ERROR)
                 return ERROR;
             
             setBits(functionIndex,"opcode",&word,line);
             setBits(2,"destin",&word,line);
             /*make word for the label*/
             setBits(address,"addres",&labelMetrix,line);
-            setBits(2,"era",&labelMetrix,line);
+            if(externalFlag)
+            {
+                setBits(1,"era",&labelMetrix,line);                
+            }
+            else
+            {
+                setBits(2,"era",&labelMetrix,line);
+            }     
             /*make word for the registers of the metrix*/
             setBits(r1,"orginReg",&regMetrix,line);
             setBits(r2,"destReg",&regMetrix,line);
 
-            addBinWord(binWordHead,word);
-            addBinWord(binWordHead,labelMetrix); 
-            addBinWord(binWordHead,regMetrix);
+            addBinWord(binWordHead,&word,*ic);
+            addBinWord(binWordHead,&labelMetrix,(*ic)+1); 
+            addBinWord(binWordHead,&regMetrix,(*ic)+2);
         }
         *ic+=3; /*1 for PSW and 2 for the metrix*/
         return 0;   
@@ -284,6 +304,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         char *tok;
         binWordList *binWordBuff;
         binWordBuff=NULL;
+        tok=NULL;
         if(cammaCounter!=1)
         {
             if(cammaCounter==0)
@@ -304,6 +325,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         secondOp=EMPTY;
         /*calculet the first operend*/
         tok=strtok(buff,",");
+        printf("tok = %s \n",tok);
         if(!isEmpty(tok)||*buff==',')
         {
             printf("ERROR:line %d: miseeng a first operend \n",line);
@@ -331,7 +353,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                   /*decod the second word*/                
                   if(setBits(intData,"immediate",&data,line)==ERROR)
                         return ERROR;
-                  addBinWord(&binWordBuff,data);     
+                  addBinWord(&binWordBuff,&data,);     
     
             }  
             
@@ -356,18 +378,25 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     initWord(&labelMetrix);
                     initWord(&regMetrix);
          
-                    if((address=isInTheList(buff,labelsHead,line))==ERROR)
+                    if((address=isInTheList(tok,labelsHead,line,&externalFlag))==ERROR)
                         return ERROR;
                         
                     setBits(2,"orgin",&word,line);
                     /*make word for the label*/
                     setBits(address,"addres",&labelMetrix,line);
-                    setBits(2,"era",&labelMetrix,line);
+                    if(externalFlag)
+                    {
+                        setBits(1,"era",&labelMetrix,line);                
+                    }
+                    else
+                    {
+                        setBits(2,"era",&labelMetrix,line);
+                    }     
                     /*make word for the registers of the metrix*/
                     setBits(r1,"orginReg",&regMetrix,line);
                     setBits(r2,"destReg",&regMetrix,line);
-                    addBinWord(&binWordBuff,labelMetrix); 
-                    addBinWord(&binWordBuff,regMetrix);
+                    addBinWord(&binWordBuff,&labelMetrix); 
+                    addBinWord(&binWordBuff,&regMetrix);
                 }
                 firstOp=MATRIX;
             }
@@ -382,10 +411,10 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     /*decode the register !!*/
                     binWord regWord;
                     initWord(&regWord);
-                    setBits(1,"orgin",&word,line);
+                    setBits(3,"orgin",&word,line);
                     /*make word for the register*/
-                    setBits(rval,"addres",&regWord,line);            
-                    addBinWord(&binWordBuff,regWord);
+                    setBits(rval,"opcode",&regWord,line);            
+                    addBinWord(&binWordBuff,&regWord);
                     regDirectOrgin=rval;
                     
                 }
@@ -403,14 +432,21 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     binWord labelWord;
                     int address;
                     initWord(&labelWord);
-                    if((address=isInTheList(buff,labelsHead,line))==ERROR)
+                    if((address=isInTheList(buff,labelsHead,line,&externalFlag))==ERROR)
                         return ERROR;
                     /*decod the orgin*/
                     setBits(3,"orgin",&word,line);
                     /*make word for the label*/
                     setBits(address,"addres",&labelWord,line);
-                    setBits(2,"era",&labelWord,line);                        
-                    addBinWord(&binWordBuff,labelWord); 
+                    if(externalFlag)
+                    {
+                        setBits(1,"era",&labelWord,line);                
+                    }
+                    else
+                    {
+                        setBits(2,"era",&labelWord,line);
+                    }     
+                    addBinWord(&binWordBuff,&labelWord); 
                 }
                 firstOp=DIRECT;
             }
@@ -450,7 +486,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                   /*decod the second word*/                
                   if(setBits(intData,"immediate",&data,line)==ERROR)
                         return ERROR;
-                  addBinWord(&binWordBuff,data);     
+                  addBinWord(&binWordBuff,&data);     
     
             }  
         }
@@ -474,18 +510,25 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     initWord(&labelMetrix);
                     initWord(&regMetrix);
          
-                    if((address=isInTheList(buff,labelsHead,line))==ERROR)
+                    if((address=isInTheList(buff,labelsHead,line,&externalFlag))==ERROR)
                         return ERROR;
                         
                     setBits(2,"destin",&word,line);
                     /*make word for the label*/
                     setBits(address,"addres",&labelMetrix,line);
-                    setBits(2,"era",&labelMetrix,line);
+                    if(externalFlag)
+                    {
+                        setBits(1,"era",&labelMetrix,line);                
+                    }
+                    else
+                    {
+                        setBits(2,"era",&labelMetrix,line);
+                    }     
                     /*make word for the registers of the metrix*/
                     setBits(r1,"orginReg",&regMetrix,line);
                     setBits(r2,"destReg",&regMetrix,line);
-                    addBinWord(&binWordBuff,labelMetrix); 
-                    addBinWord(&binWordBuff,regMetrix);
+                    addBinWord(&binWordBuff,&labelMetrix); 
+                    addBinWord(&binWordBuff,&regMetrix);
                 }
                 secondOp=MATRIX;
             }
@@ -500,10 +543,10 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     regDirectDest=rval;
                     /*decode the register !!*/
                     initWord(&regWord);                    
-                    setBits(1,"destin",&word,line);
+                    setBits(3,"destin",&word,line);
                     /*make word for the register*/
                     setBits(rval,"addres",&regWord,line);            
-                    addBinWord(&binWordBuff,regWord); 
+                    addBinWord(&binWordBuff,&regWord); 
                 }
                 secondOp=REG_DIRECT;
             }
@@ -519,14 +562,21 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     binWord labelWord;
                     int address;
                     initWord(&labelWord);
-                    if((address=isInTheList(buff,labelsHead,line))==ERROR)
+                    if((address=isInTheList(tok,labelsHead,line,&externalFlag))==ERROR)
                         return ERROR;
                     /*decod the destin*/
-                    setBits(3,"destin",&word,line);
+                    setBits(1,"destin",&word,line);
                     /*make word for the label*/
                     setBits(address,"addres",&labelWord,line);
-                    setBits(2,"era",&labelWord,line);                        
-                    addBinWord(&binWordBuff,labelWord); 
+                    if(externalFlag)
+                    {
+                        setBits(1,"era",&labelWord,line);                
+                    }
+                    else
+                    {
+                        setBits(2,"era",&labelWord,line);
+                    }     
+                    addBinWord(&binWordBuff,&labelWord); 
                 }
                 secondOp=DIRECT;
             }
@@ -609,7 +659,8 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                 initWord(&registers);
                 setBits(regDirectOrgin,"orginReg",&registers,line);
                 setBits(regDirectDest,"destReg",&registers,line);
-                addBinWord(binWordHead,word);
+                addBinWord(binWordHead,&word);
+                addBinWord(binWordHead,&registers);                
                 /*delete the buf binWord */
                 while (binWordBuff != NULL)
                 { 
@@ -625,7 +676,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
 
         if(secondRun==ON)
         {
-            addBinWord(binWordHead,word);
+            addBinWord(binWordHead,&word);
             catBinWordList(binWordHead,&binWordBuff);
         }    
         *ic+=(secondCost+firstCost + 1);/*1 for psw*/
@@ -635,10 +686,10 @@ if(_action[functionIndex].operends==0)/*if no operends*/
     return ERROR;
 }
 
- int isInTheList(char *label,labelsList **labelsHead,int line)
+ int isInTheList(char *label,labelsList **labelsHead,int line,int *externalFlag)
  {
-    SWITCHER isIn=OFF;
     int i=0,functionLen;
+    *externalFlag=0;    
     while(isspace(*label)){label++;}
     while(!isspace(label[i])&&label[i]!='\0'){i++;}
     functionLen = i;
@@ -649,19 +700,57 @@ if(_action[functionIndex].operends==0)/*if no operends*/
       {
         if(functionLen==strlen((*labelsHead)->label))
         {
-        isIn=ON;
+        if((*labelsHead)->external==ON)
+        {
+            *externalFlag=1;
+        }
+        return (*labelsHead)->address;
         }
       }
       labelsHead = &( (*labelsHead)->next);    
     }
-    if(isIn==OFF)
-    {
+  
         printf("error:line %d:the label in the function not declir enywear !!\n",line);
             return ERROR;
-    }
-    return 0;
+    
 }
 void initWord(binWord *word)
 {
     word->opcode=word->orgin=word->dest=word->era=0;      
+}/*
+void printAndfree(binWordList *binWordHead)
+{
+    binWordList* temp;
+        while (binWordHead != NULL)
+        { 
+            temp = binWordHead; 
+            binWordHead = binWordHead->next;            
+            temp ->next=NULL;
+            binWordToStrangeBase(&(temp->word));
+            free(temp);
+        }
+    
+}
+ */ 
+void printAndfreeData(dataList *dataHead)
+{
+    binWord dataWord,addressWord;
+    dataList *temp;
+    while (dataHead != NULL)
+    { 
+        unsigned int data,address;
+        initWord(&dataWord);
+        initWord(&addressWord);
+        
+        temp = dataHead; 
+        dataHead = dataHead->next; 
+        temp ->next=NULL;        
+        data=temp->data;
+        address=temp->address;
+        setBits(data,"number",&dataWord,0);
+        setBits(address,"number",&addressWord,0);        
+        binWordToStrangeBase(&addressWord,&dataWord);
+        free(temp);
+    }
+
 }

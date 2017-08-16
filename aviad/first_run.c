@@ -41,6 +41,7 @@ int matF(char *command,char *label,int *dc,dataList **dataHead,labelsList **labe
 int externF(char *buff,char *label,labelsList **labelsHead,int line);
 int entryF(char * buff,char *label,int line);
 void updateDataLabel(labelsList **labelsHead,int curIc);
+void updateDataList(dataList **dataHead,int curIc);
 
 char * isLabel(char * buf,int *error,int line);
 
@@ -184,8 +185,11 @@ if(*dc==0 && *ic==INIT_IC)/*chack if is no a empty file */
   } 
   else if(errorFlag== OFF)
   {
+    /*update addres of the data*/
     updateDataLabel(labelsHead,*ic);
-	  return TRUE;  
+    updateDataList(dataHead,*ic);
+    
+	  return 0;  
   }
   return ERROR;
 }
@@ -199,5 +203,14 @@ void updateDataLabel(labelsList **labelsHead,int curIc)
       (*labelsHead)->address+=curIc;
     }
     labelsHead = &( (*labelsHead)->next);    
+  }
+}
+void updateDataList(dataList **dataHead,int curIc)
+{
+  while(*dataHead)
+  {
+      (*dataHead)->address+=curIc;
+      dataHead = &( (*dataHead)->next);    
+      
   }
 }

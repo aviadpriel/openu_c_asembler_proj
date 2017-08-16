@@ -249,10 +249,13 @@ int isDirectiveAddressing(char * buff,int line)
     printf("error:line %d: operend cannot be a reserved word!! \n",line);
     return ERROR;
   }
-    i++;
-    while (isspace(buff[i])) {i++;}/**/
+    
+    while (isspace(buff[i])&&buff[i]!='\n') {i++;}/**/
     if(buff[i]!='\0')
+    {
+    printf("error !!! = %c  \n",buff[i]) ;   
     return ERROR;
+    }
     /*All tests have been done so word is a labe
     test the len of the label
     */
@@ -297,9 +300,10 @@ for(i=0;i<=7;i++)
 */
 int isMatrix(char *buff,int line,int * r1,int *r2)
 {
-    char *label =NULL,*temp =NULL;    
+    char *label,*temp =NULL;    
     char openBracket='[',closeBracket=']';
     int openCunter=0,closeCunter=0,i=0,rval;
+    label=NULL;
     while(buff[i]!='\0')
     {
         if(buff[i]==openBracket)
@@ -326,13 +330,14 @@ int isMatrix(char *buff,int line,int * r1,int *r2)
 /*check the label*/
     while (isspace(*buff)) {buff++;}
     i=0;
-    while(buff[i]!=openBracket ||isspace(buff[i])){i++;}
-    label=(char *)malloc(sizeof(char)*i);
+    while(buff[i]!=openBracket&&!isspace(buff[i])){i++;}
+    label=(char *)malloc(sizeof(char)*(i+1));
     if(!label)
     {
         printf("mermory error !! exit");
         exit(1);
     }
+    memset(label,'\0',i+1);
     strncpy(label,buff,i);
     if(isDirectiveAddressing(label,line)!=VALID)
     {

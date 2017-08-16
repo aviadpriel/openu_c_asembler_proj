@@ -24,34 +24,18 @@ typedef struct bitType{
     {NULL,ERROR,ERROR}};     
 
 int first_run(FILE *fp,labelsList **labelsHead,dataList **dataHead,int *dc,int *ic);
+int second_run(FILE *fp,labelsList **labelsHead,dataList **dataHead, char *file_name);
 /***************/
 int decodeData(binWord * word,int data,int line);
 int setBits(int data,char * type,binWord * word,int line);
 void setBitsAddresOrImmediate(binWord * word,int data);
 int binWordToInt(binWord *word);
-void binWordToStrangeBase(binWord *word);
+void binWordToStrangeBase(binWord *addressWord,binWord *dataWord);
+void initWord(binWord * word);
 /***************************/
 void updateEntry(char *label,labelsList **labelsHead,int line);
 int main()
 {
-    int word=0;
-binWord test;
-test.era=test.dest=test.orgin=test.opcode=0;
-setBits(-655,"number",&test,0);
-
-printf(" test.opcode = %d \n test.orgin = %d \n test.dest = %d \n test.era = %d \n",test.opcode ,test.orgin,test.dest,test.era);
-word|=test.opcode;
-word<<=2;
-word|=test.orgin;
-word<<=2;
-word|=test.dest;
-word<<=2;
-word|=test.era;
-printf("word in int is %d \n",word);
-binWordToStrangeBase(&test);
-return 0;
-    
-    /*
 labelsList *labelsHead=NULL;
 
 dataList *dataHead=NULL;
@@ -65,13 +49,27 @@ exit(1);
 }
 
 
-rval=first_run(fp,&labelsHead,&dataHead,&dc,&ic); 
+rval=first_run(fp,&labelsHead,&dataHead,&dc,&ic);
 printf("ic is :%d \n dc is :%d \n rval is :%d \n",ic,dc,rval);
-updateEntry("    aviasd",&labelsHead,0);   
+if(!rval)
+{
+    second_run(fp, &labelsHead, &dataHead, NULL);    
+}
 freeDataList(dataHead);
 freeLabelsList(labelsHead);
-return 0; */
+return 0; 
 }
+/*
+int main()
+{
+    binWord word;
+    initWord(&word);
+    word.era=2;
+    setBits(133,"addres",&word,0);
+    binWordToStrangeBase(&word);
+    return 0;
+
+}*/
 int setBits(int data,char * type,binWord * word,int line)
 {
     int i;
@@ -177,7 +175,7 @@ int decodeData(binWord * word,int data,int line)
 
 void setBitsAddresOrImmediate(binWord * word,int data)
 {
-    int mask2Bits = 2,mask4Bits=15;
+    int mask2Bits = 3,mask4Bits=15;
     word->dest=data&mask2Bits;
     data >>=2;
     word->orgin=data&mask2Bits;
@@ -197,20 +195,32 @@ int binWordToInt(binWord *word)
     intNum|=word->era;
     return intNum;
 }
-void binWordToStrangeBase(binWord *word)
+void binWordToStrangeBase(binWord *addressWord,binWord *dataWord)
 {
-    int temp=0;
+    int intAddress=0,intData=0;
     char *base4 ={"ABCD"};
-    char a[5]={"\0"};
-    temp=word->opcode;
-    temp>>=2;
-    a[0]=base4[temp];
-    temp=word->opcode;
-    temp&=3;
-    a[1]=base4[temp];
-    a[2]=base4[word->orgin];
-    a[3]=base4[word->dest];
-    a[4]=base4[word->era];
-    printf("%s  !!!\n",a);
+    char address[5]={"\0"};
+    char data[6]={"\0"};    
+   
+    intAddress=addressWord->opcode;
+    intAddress&=3;
+    address[0]=base4[intAddress];    
+    address[1]=base4[addressWord->orgin];
+    address[2]=base4[addressWord->dest];
+    address[3]=base4[addressWord->era];
+
+    /*decode the data word*/
+    intData=dataWord->opcode;
+    intData>>=2;
+    data[0]=base4[intData];
+    intData=dataWord->opcode;
+    intData&=3;
+    data[1]=base4[intData];
+    data[2]=base4[dataWord->orgin];
+    data[3]=base4[dataWord->dest];
+    data[4]=base4[dataWord->era];
+
+
+    printf("%s \t %s \n",address,data);
 }
 

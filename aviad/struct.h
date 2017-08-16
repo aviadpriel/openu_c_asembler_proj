@@ -25,12 +25,14 @@ void freeLabelsList(labelsList *labelsHead);
 #endif
 #ifndef DATA_LIST_1
 #define DATA_LIST_1
+
 typedef struct dataList{
 int data:WORD_SIZE;
+int address;
 struct dataList *next;
 }dataList;
 
-void insertData(dataList **dataHead,int data);
+void insertData(dataList **dataHead,int data,int address);
 void freeDataList(dataList *dataHead);
 #endif
 
@@ -54,6 +56,7 @@ typedef struct binWord{
   unsigned int orgin:2;
   unsigned int dest:2;
   unsigned int era:2;
+           int address;
    }binWord;
   
    typedef struct binWordList{

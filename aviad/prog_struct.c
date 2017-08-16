@@ -6,7 +6,6 @@
 #define ERROR -1
 #define LABEL_MAX_LEN 30
 
-
 typedef enum {ON,OFF,WAIT} SWITCHER;
 typedef struct bitType{
 
@@ -16,11 +15,13 @@ typedef struct bitType{
 }bitType;
 
 typedef struct binWord{
-  int opcode:4;
-  int orgin:2;
-  int dest:2;
-  int era:2;
+ unsigned int opcode:4;
+ unsigned int orgin:2;
+ unsigned int dest:2;
+ unsigned int era:2;
+          int address;
   }binWord; 
+  void binWordToStrangeBase(binWord *word);
 
   typedef struct binWordList{
     binWord word;
@@ -38,6 +39,7 @@ struct labelsList *next;
 } labelsList;
 typedef struct dataList{
 int data:WORD_SIZE;
+int address;
 struct dataList *next;
 }dataList;
 typedef struct commandList{
@@ -46,10 +48,10 @@ int operends;
 int operendGroup;
 }commandList;
 
-dataList* newData(int data);
+dataList* newData(int data,int address);
 
 /************dataList functions*******/
-dataList* newData(int data)
+dataList* newData(int data,int address)
 {
   dataList *p = (dataList*)malloc(sizeof(dataList));
   if(!p)
@@ -58,17 +60,18 @@ dataList* newData(int data)
     exit(1);
   }
   p->data = data;
+  p->address=address;
   p->next=NULL;
   return p;
 }
 
 
-void insertData(dataList **dataHead,int data)
+void insertData(dataList **dataHead,int data,int address)
 {
    dataList *current=(*dataHead);
   if(!(*dataHead))
   {
-  (*dataHead)=newData(data);
+  (*dataHead)=newData(data,address);
 
   }
   else
@@ -76,7 +79,7 @@ void insertData(dataList **dataHead,int data)
     while (current->next != NULL) {
         current = current->next;
     }
-    current->next=newData(data);
+    current->next=newData(data,address);
     }
 }
 
@@ -169,7 +172,7 @@ int updateEntry(char *label,labelsList **labelsHead,int line)
 return 0;
 }
 
-binWordList* newBinWord(binWord word)
+binWordList* newBinWord(binWord word,int address)
 {
   binWordList *p = (binWordList*)malloc(sizeof(binWordList));
   if (!p) {
@@ -180,16 +183,17 @@ binWordList* newBinWord(binWord word)
   p->word.orgin=word.orgin;
   p->word.dest=word.dest;
   p->word.era=word.era;
+  p->word.address=address;
   p->next=NULL;
   return p;
 }
-void addBinWord(binWordList **binWordHead,binWord word)
+void addBinWord(binWordList **binWordHead,binWord *word,int address)
 {
   while(*binWordHead)
   {
     binWordHead = &( (*binWordHead)->next);
   }
-*binWordHead = newBinWord(word);
+*binWordHead = newBinWord(*word,address);
 }
 void catBinWordList(binWordList **binWordHead,binWordList **binWordBuff)
 {

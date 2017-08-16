@@ -1,11 +1,18 @@
-MAIN:   mov M1[r2][r7],LENGTH
-        ;;;;aviad priel
-LOOP:   jmp END
+.entry LOOP
+.entry LENGTH
+.extern L3
+.extern W
+MAIN:   mov M1 [r2][r7],W
+        add r2,STR
+LOOP:   jmp W
         prn #-5
-        jmp r1
         sub r1,r4
         inc K
-        mov M1[r3][r3],r3
-STR:    .string "ab  cdef"
-K:      .data   22,1,2,3,43,99
-M1:     .mat  [2][2]  
+
+        mov M1 [r3][r3],r3
+        bne L3
+END:    stop
+STR:    .string "abcdef"
+LENGTH:  .data 6,-9,15
+K:      .data 22
+M1:     .mat[2][2]  1,2,3,4
