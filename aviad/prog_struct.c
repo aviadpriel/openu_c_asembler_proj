@@ -19,12 +19,12 @@ typedef struct binWord{
  unsigned int orgin:2;
  unsigned int dest:2;
  unsigned int era:2;
-          int address;
   }binWord; 
   void binWordToStrangeBase(binWord *word);
 
   typedef struct binWordList{
     binWord word;
+    int address;    
     struct binWordList *next;
 }binWordList;
 
@@ -183,7 +183,7 @@ binWordList* newBinWord(binWord word,int address)
   p->word.orgin=word.orgin;
   p->word.dest=word.dest;
   p->word.era=word.era;
-  p->word.address=address;
+  p->address=address;
   p->next=NULL;
   return p;
 }
@@ -195,11 +195,18 @@ void addBinWord(binWordList **binWordHead,binWord *word,int address)
   }
 *binWordHead = newBinWord(*word,address);
 }
-void catBinWordList(binWordList **binWordHead,binWordList **binWordBuff)
+void catBinWordList(binWordList **binWordHead,binWordList **binWordBuff,int curIC)
 {
+  int add=curIC+1; 
   while(*binWordHead)
   {
     binWordHead = &( (*binWordHead)->next);
   }
   *binWordHead=*binWordBuff;
+  while(*binWordHead)
+  {
+    (*binWordHead)->address=add;
+    binWordHead = &( (*binWordHead)->next);
+    add++;    
+  }  
 }

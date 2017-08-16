@@ -89,12 +89,12 @@ int stringF(char *command, char *label, int *dc, dataList **dataHead, labelsList
   i++; /*for pass the " char*/
   while ((data = command[i]) != '\"')
   {
-    insertData(dataHead, data);
+    insertData(dataHead, data,*dc);
     (*dc)++;
     i++;
   }
   /*add a 0 in the and if the string*/
-  insertData(dataHead, 0);
+  insertData(dataHead, 0,*dc);
   (*dc)++;
   /*Check with the rest of the line without characters*/
   i++;
@@ -235,7 +235,7 @@ printf("error:line %d: in .mat [num1][num2] format\n",line);
     
     for (; matLen > 0; matLen--)
     {
-      insertData(dataHead, 0);
+      insertData(dataHead, 0,*dc);
       (*dc)++;
     }
   }
@@ -255,7 +255,7 @@ printf("error:line %d: in .mat [num1][num2] format\n",line);
       diff = matLen-(counter+1);
       for (; diff > 0; diff--)
       {
-        insertData(dataHead, 0);
+        insertData(dataHead, 0,*dc);
         (*dc)++;
       }
     }  
@@ -393,7 +393,7 @@ int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc,int 
       printf("error:line %d: un prespectiv varible!! %c \n",line,*cp);
       return ERROR;
     }else{
-        insertData(dataHead, data);
+        insertData(dataHead, data,*dc);
       *dc+=1;
       return TRUE;
     }
@@ -429,7 +429,7 @@ int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc,int 
     }
     else
     {
-      insertData(dataHead, data);
+      insertData(dataHead, data,*dc);
       *dc+=1;
     }
     cp = strtok(NULL, ",");

@@ -56,11 +56,11 @@ typedef struct binWord{
   unsigned int orgin:2;
   unsigned int dest:2;
   unsigned int era:2;
-           int address;
    }binWord;
   
    typedef struct binWordList{
     binWord word;
+    int address;    
     struct binWordList *next;
 }binWordList;
 
