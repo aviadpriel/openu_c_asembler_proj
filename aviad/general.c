@@ -33,7 +33,7 @@ static commandList _action[]={{"mov",2,4,3},
 *6 learn to infi 2
 */
 
-int identifications(char * buff,int functionIndex,int line,int *ic,SWITCHER secondRun,binWordList **binWordHead,labelsList **labelsHead)
+int identification(char * buff,int functionIndex,int line,int *ic,SWITCHER secondRun,binWordList **binWordHead,labelsList **labelsHead)
 {    
 binWord word;
 addressing_method firstOp,secondOp;    
@@ -601,74 +601,3 @@ if(_action[functionIndex].operends==0)/*if no operends*/
     return ERROR;
 }
 
- int isInTheList(char *label,labelsList **labelsHead,int line,int *externalFlag)
- {
-    int i=0,functionLen;
-    *externalFlag=0;    
-    while(isspace(*label)){label++;}
-    while(!isspace(label[i])&&label[i]!='\0'){i++;}
-    functionLen = i;
-    /* insert using a loop and pointer to pointer*/
-    while(*labelsHead)
-    {
-      if(strncmp(label,(*labelsHead)->label,strlen((*labelsHead)->label))==0)/*need to update the entry flag */
-      {
-        if(functionLen==strlen((*labelsHead)->label))
-        {
-        if((*labelsHead)->external==ON)
-        {
-            *externalFlag=1;
-        }
-        return (*labelsHead)->address;
-        }
-      }
-      labelsHead = &( (*labelsHead)->next);    
-    }
-  
-        printf("error:line %d:the label in the function not declir enywear !!\n",line);
-            return ERROR;
-    
-}
-void initWord(binWord *word)
-{
-    word->opcode=word->orgin=word->dest=word->era=0;      
-}
-void printAndfree(binWordList *binWordHead)
-{
-    binWordList* temp;
-    binWord addressWord;
-        while (binWordHead != NULL)
-        { 
-            initWord(&addressWord);            
-            temp = binWordHead; 
-            binWordHead = binWordHead->next;            
-            temp ->next=NULL;
-            setBits(temp->address,"number",&addressWord,0);                    
-            binWordToStrangeBase(&addressWord,&(temp->word));
-            free(temp);
-        }
-    
-}
- 
-void printAndfreeData(dataList *dataHead)
-{
-    binWord dataWord,addressWord;
-    dataList *temp;
-    while (dataHead != NULL)
-    { 
-        unsigned int data,address;
-        initWord(&dataWord);
-        initWord(&addressWord);
-        
-        temp = dataHead; 
-        dataHead = dataHead->next; 
-        temp ->next=NULL;        
-        data=temp->data;
-        address=temp->address;
-        setBits(data,"number",&dataWord,0);
-        setBits(address,"number",&addressWord,0);        
-        binWordToStrangeBase(&addressWord,&dataWord);
-        free(temp);
-    }
-
-}

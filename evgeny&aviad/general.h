@@ -7,16 +7,9 @@ what to include inside wrapper?
 #ifndef GENERAL_H
 #define GENERAL_H
 
-enum symbol_flag {}
 /*****************************************************************************************************************************************************
 
 *****************************************************************************************************************************************************/
-typedef struct machine_code_node
-{
-    binWord word;/*assemblers base line*/
-    machine_code *next;/*pointer to next assemblers base line*/
-    binWord *nextDown;/*pointer to next word (if needed) related to this psw */
-    int commandLineCnt;/*number line of the original file line*/
 
 }machine_code_node;
 

@@ -29,12 +29,13 @@ Remarks
 #include<ctype.h>
 #include<stdlib.h>
 #include<string.h>
+
 /*evgeny : Declaration of functions that must be written (in another file)*/
 int isComment(char * buff);
 int isDirective(char *command);
 int isAction(char *command);
 int isRegister(char *buf);
-int identifications(char * buff,int functionIndex,int line,int *ic,SWITCHER secondRun,binWordList **binWordHead,labelsList **labelsHead);
+int identification(char * buff,int functionIndex,int line,int *ic,SWITCHER secondRun,binWordList **binWordHead,labelsList **labelsHead);
 int dataF(char *command, char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line);
 int stringF(char *command,char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line);
 int matF(char *command,char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line);
@@ -158,7 +159,7 @@ int first_run(FILE *fp,labelsList **labelsHead,dataList **dataHead,int *dc,int *
     {
       int curIc=*ic;
       buff= strtok(NULL,"\n");/*we get the rest of the line*/
-	    if(identifications(buff,functionIndex,lineCounter,ic,OFF,NULL,NULL)==ERROR)
+	    if(identification(buff,functionIndex,lineCounter,ic,OFF,NULL,NULL)==ERROR)
 	    {
 		      errorFlag=ON;
 	    }else if(label)
@@ -192,25 +193,4 @@ if(*dc==0 && *ic==INIT_IC)/*chack if is no a empty file */
 	  return 0;  
   }
   return ERROR;
-}
-
-void updateDataLabel(labelsList **labelsHead,int curIc)
-{
-  while(*labelsHead)
-  {
-    if((*labelsHead)->data==ON)
-    {
-      (*labelsHead)->address+=curIc;
-    }
-    labelsHead = &( (*labelsHead)->next);    
-  }
-}
-void updateDataList(dataList **dataHead,int curIc)
-{
-  while(*dataHead)
-  {
-      (*dataHead)->address+=curIc;
-      dataHead = &( (*dataHead)->next);    
-      
-  }
 }
