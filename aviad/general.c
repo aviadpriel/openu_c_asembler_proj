@@ -33,7 +33,7 @@ static commandList _action[]={{"mov",2,4,3},
 *6 learn to infi 2
 */
 
-int identification(char * buff,int functionIndex,int line,int *ic,SWITCHER secondRun,binWordList **binWordHead,labelsList **labelsHead)
+int identification(char * buff,int functionIndex,int line,int *ic,SWITCHER secondRun,binWordList **binWordHead,labelsList **labelsHead,extEntList **extEntHead)
 {    
 binWord word;
 addressing_method firstOp,secondOp;    
@@ -149,7 +149,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
             binWord labelWord;
             int address;            
             initWord(&labelWord);
-            if((address=isInTheList(buff,labelsHead,line,&externalFlag))==ERROR)
+            if((address=isInTheList(buff,labelsHead,line,&externalFlag,extEntHead,(*ic)+1))==ERROR)
                 return ERROR;
             
             setBits(functionIndex,"opcode",&word,line);
@@ -183,7 +183,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
             initWord(&labelMetrix);
             initWord(&regMetrix);
  
-            if((address=isInTheList(buff,labelsHead,line,&externalFlag))==ERROR)
+            if((address=isInTheList(buff,labelsHead,line,&externalFlag,extEntHead,(*ic)+1))==ERROR)
                 return ERROR;
             
             setBits(functionIndex,"opcode",&word,line);
@@ -219,6 +219,8 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         int regDirectOrgin,regDirectDest;
         char *tok;
         binWordList *binWordBuff;
+        extEntList *extEntBuff;
+        int binWordCunter =0;
         binWordBuff=NULL;
         tok=NULL;
         if(cammaCounter!=1)
@@ -268,7 +270,9 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                   /*decod the second word*/                
                   if(setBits(intData,"immediate",&data,line)==ERROR)
                         return ERROR;
-                  addBinWord(&binWordBuff,&data,0);     
+                  addBinWord(&binWordBuff,&data,0);
+                  addExtEnt(&extEntBuff,NULL,ERROR,DATA);                  
+                  binWordCunter++;
     
             }  
             
@@ -293,7 +297,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     initWord(&labelMetrix);
                     initWord(&regMetrix);
          
-                    if((address=isInTheList(tok,labelsHead,line,&externalFlag))==ERROR)
+                    if((address=isInTheList(buff,labelsHead,line,&externalFlag,&extEntBuff,binWordCunter))==ERROR)
                         return ERROR;
                         
                     setBits(2,"orgin",&word,line);
@@ -301,10 +305,13 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     setBits(address,"addres",&labelMetrix,line);
                     if(externalFlag)
                     {
-                        setBits(1,"era",&labelMetrix,line);                
+                        setBits(1,"era",&labelMetrix,line);
+                        addExtEnt(&extEntBuff,NULL,ERROR,DATA);                        
                     }
                     else
                     {
+                        addExtEnt(&extEntBuff,NULL,ERROR,DATA);
+                        addExtEnt(&extEntBuff,NULL,ERROR,DATA);                        
                         setBits(2,"era",&labelMetrix,line);
                     }     
                     /*make word for the registers of the metrix*/
@@ -312,6 +319,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     setBits(r2,"destReg",&regMetrix,line);
                     addBinWord(&binWordBuff,&labelMetrix,0); 
                     addBinWord(&binWordBuff,&regMetrix,0);
+                    binWordCunter+=2;
                 }
                 firstOp=MATRIX;
             }
@@ -330,6 +338,8 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     /*make word for the register*/
                     setBits(rval,"opcode",&regWord,line);            
                     addBinWord(&binWordBuff,&regWord,0);
+                    addExtEnt(&extEntBuff,NULL,ERROR,DATA);                    
+                    binWordCunter++;
                     regDirectOrgin=rval;
                     
                 }
@@ -347,8 +357,8 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     binWord labelWord;
                     int address;
                     initWord(&labelWord);
-                    if((address=isInTheList(buff,labelsHead,line,&externalFlag))==ERROR)
-                        return ERROR;
+                    if((address=isInTheList(buff,labelsHead,line,&externalFlag,&extEntBuff,binWordCunter))==ERROR)
+                    return ERROR;
                     /*decod the orgin*/
                     setBits(3,"orgin",&word,line);
                     /*make word for the label*/
@@ -359,9 +369,11 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     }
                     else
                     {
+                        addExtEnt(&extEntBuff,NULL,ERROR,DATA);                        
                         setBits(2,"era",&labelWord,line);
                     }     
-                    addBinWord(&binWordBuff,&labelWord,0); 
+                    addBinWord(&binWordBuff,&labelWord,0);
+                    binWordCunter++; 
                 }
                 firstOp=DIRECT;
             }
@@ -401,7 +413,10 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                   /*decod the second word*/                
                   if(setBits(intData,"immediate",&data,line)==ERROR)
                         return ERROR;
-                  addBinWord(&binWordBuff,&data,0);     
+                  addBinWord(&binWordBuff,&data,0);
+                  addExtEnt(&extEntBuff,NULL,ERROR,DATA);
+                  
+                  binWordCunter++;     
     
             }  
         }
@@ -425,25 +440,31 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     initWord(&labelMetrix);
                     initWord(&regMetrix);
          
-                    if((address=isInTheList(buff,labelsHead,line,&externalFlag))==ERROR)
-                        return ERROR;
+                    if((address=isInTheList(buff,labelsHead,line,&externalFlag,&extEntBuff,binWordCunter))==ERROR)
+                    return ERROR;
                         
                     setBits(2,"destin",&word,line);
                     /*make word for the label*/
                     setBits(address,"addres",&labelMetrix,line);
                     if(externalFlag)
                     {
-                        setBits(1,"era",&labelMetrix,line);                
+                        setBits(1,"era",&labelMetrix,line); 
+                        addExtEnt(&extEntBuff,NULL,ERROR,DATA);
+                        
                     }
                     else
                     {
                         setBits(2,"era",&labelMetrix,line);
+                        addExtEnt(&extEntBuff,NULL,ERROR,DATA);
+                        addExtEnt(&extEntBuff,NULL,ERROR,DATA);
+                        
                     }     
                     /*make word for the registers of the metrix*/
                     setBits(r1,"orginReg",&regMetrix,line);
                     setBits(r2,"destReg",&regMetrix,line);
                     addBinWord(&binWordBuff,&labelMetrix,0); 
                     addBinWord(&binWordBuff,&regMetrix,0);
+                    binWordCunter+=2;
                 }
                 secondOp=MATRIX;
             }
@@ -461,7 +482,10 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     setBits(3,"destin",&word,line);
                     /*make word for the register*/
                     setBits(rval,"addres",&regWord,line);            
-                    addBinWord(&binWordBuff,&regWord,0); 
+                    addBinWord(&binWordBuff,&regWord,0);
+                    addExtEnt(&extEntBuff,NULL,ERROR,DATA);
+                    
+                    binWordCunter++;
                 }
                 secondOp=REG_DIRECT;
             }
@@ -477,8 +501,8 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     binWord labelWord;
                     int address;
                     initWord(&labelWord);
-                    if((address=isInTheList(tok,labelsHead,line,&externalFlag))==ERROR)
-                        return ERROR;
+                    if((address=isInTheList(tok,labelsHead,line,&externalFlag,&extEntBuff,binWordCunter))==ERROR)
+                    return ERROR;
                     /*decod the destin*/
                     setBits(1,"destin",&word,line);
                     /*make word for the label*/
@@ -489,9 +513,11 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     }
                     else
                     {
+                        addExtEnt(&extEntBuff,NULL,ERROR,DATA);                        
                         setBits(2,"era",&labelWord,line);
                     }     
-                    addBinWord(&binWordBuff,&labelWord,0); 
+                    addBinWord(&binWordBuff,&labelWord,0);
+                    binWordCunter++; 
                 }
                 secondOp=DIRECT;
             }
@@ -575,7 +601,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                 setBits(regDirectOrgin,"orginReg",&registers,line);
                 setBits(regDirectDest,"destReg",&registers,line);
                 addBinWord(binWordHead,&word,*ic);
-                addBinWord(binWordHead,&registers,(*ic)+1);            
+                addBinWord(binWordHead,&registers,(*ic)+1);
                 /*delete the buf binWord */
                 while (binWordBuff != NULL)
                 { 
@@ -593,6 +619,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
         {
             addBinWord(binWordHead,&word,(*ic));
             catBinWordList(binWordHead,&binWordBuff,*ic);
+            catExtEntList(extEntHead,&extEntBuff,*ic);
         }    
         *ic+=(secondCost+firstCost + 1);/*1 for psw*/
         return 0;

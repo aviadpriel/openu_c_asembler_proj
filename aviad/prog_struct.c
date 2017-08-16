@@ -6,7 +6,6 @@
 #define WORD_SIZE 10
 #define ERROR -1
 #define LABEL_MAX_LEN 30
-
 /*for bin word*/
 typedef struct bitType{
   char * type;
@@ -28,6 +27,15 @@ typedef struct bitType{
 
 
 typedef enum {ON,OFF,WAIT} SWITCHER;
+typedef enum {DATA=0,STRING=1,MATRIXF=2,ENTRY=3,EXTERN=4} DIRECRIVE_FUNCTION;
+
+typedef struct extEntList{
+  char *label;
+  int address;
+  DIRECRIVE_FUNCTION type;
+  struct extEntList *next;
+}extEntList;
+void addExtEnt(extEntList **extEntHead,char *label,int address,DIRECRIVE_FUNCTION type);
 
 typedef struct binWord{
  unsigned int opcode:4;
@@ -249,10 +257,13 @@ void catBinWordList(binWordList **binWordHead,binWordList **binWordBuff,int curI
   }  
 }
 
-int isInTheList(char *label,labelsList **labelsHead,int line,int *externalFlag)
+int isInTheList(char *label,labelsList **labelsHead,int line,int *externalFlag,extEntList **extEntHead,int address)
 {
    int i=0,functionLen;
-   *externalFlag=0;    
+   if(externalFlag)
+   {
+   *externalFlag=0;
+   }   
    while(isspace(*label)){label++;}
    while(!isspace(label[i])&&label[i]!='\0'){i++;}
    functionLen = i;
@@ -263,10 +274,26 @@ int isInTheList(char *label,labelsList **labelsHead,int line,int *externalFlag)
      {
        if(functionLen==strlen((*labelsHead)->label))
        {
-       if((*labelsHead)->external==ON)
-       {
-           *externalFlag=1;
-       }
+          if((*labelsHead)->external==ON)
+          {
+            addExtEnt(extEntHead,(*labelsHead)->label,address,EXTERN);            
+            if(externalFlag)
+            {
+            *externalFlag=1;
+            }
+            
+
+          }else if((*labelsHead)->entry==ON)
+          {
+            if(externalFlag)
+            {
+              addExtEnt(extEntHead,(*labelsHead)->label,address,ENTRY);                 
+            }
+            else
+            {
+              addExtEnt(extEntHead,(*labelsHead)->label,(*labelsHead)->address,ENTRY);                 
+            }
+          }
        return (*labelsHead)->address;
        }
      }
@@ -477,5 +504,61 @@ void printAndfreeData(dataList *dataHead)
        free(temp);
    }
 
+}
+
+extEntList* newExtEnt(char *label,int address,DIRECRIVE_FUNCTION type)
+{
+  extEntList *p = (extEntList*)malloc(sizeof(extEntList));
+  if (!p) {
+    printf("memmory error exit\n");
+    exit(1);
+  }
+  if(label)
+  {
+  p->label=(char*)malloc(sizeof(char)*strlen(label));
+  memset(p->label,'\0',strlen(label));
+  strcpy(p->label,label);
+  }
+  else{
+  p->label=NULL;
+  }
+  p->address=address;
+  p->type=type;
+  p->next=NULL;
+  return p;
+}
+
+void addExtEnt(extEntList **extEntHead,char *label,int address,DIRECRIVE_FUNCTION type)
+{
+  while(*extEntHead)
+  {
+    extEntHead = &( (*extEntHead)->next);
+  }
+*extEntHead = newExtEnt(label,address,type);
+}
+
+void catExtEntList(extEntList **extEntHead,extEntList **extEntBuff,int ic)
+{
+  extEntList *temp;
+  while(*extEntHead)
+  {
+    extEntHead = &( (*extEntHead)->next);
+  }
+  /* *extEntHead = null*/
+  while(*extEntBuff)
+  {
+    if((*extEntBuff)->label)
+    {
+      *extEntHead = *extEntBuff;
+      extEntBuff = &( (*extEntBuff)->next);
+      (*extEntHead)->next=NULL;
+      (*extEntHead)->address+=ic+1;
+    }else
+    {
+      temp=*extEntBuff;
+      extEntBuff = &( (*extEntBuff)->next);
+      free(temp);      
+    }
+  }
 }
 
