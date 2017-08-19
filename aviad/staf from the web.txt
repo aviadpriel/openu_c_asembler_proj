@@ -1,3 +1,0 @@
-http://forgetcode.com/C/103-pass-one-of-a-two-pass-assembler
-
-https://github.com/ayushoriginal/Two-pass-Assembler/blob/master/
