@@ -19,7 +19,7 @@
 #define LABEL_MAX_LEN 30
 #define COMMENT_FLAG ';'
 #define INIT_IC 100
-
+#define WORD_SIZE 10
 /* operation types and  addressing_method*/
 #ifndef  ADDRESSING_METHOD_1
 #define ADDRESSING_METHOD_1

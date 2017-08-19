@@ -7,40 +7,38 @@
  int isEmpty(char * buff);
 int countrChars(char *word,char c,int line);/*from testFunction.c*/
 /*מבנה נתונים לאחסון הפונקציות*/
-typedef struct commandList{
+typedef struct cmdList{
 char *name;  
-int operends;
-int firstOperendGroup;
-int secondOperendGroup;
-}commandList;
-/*לזיהוי סוג המיעון*/
-static commandList _action[]={{"mov",2,4,3},
-				{"cmp",2,4,4},
-				{"add",2,4,3},
-				{"sub",2,4,3},
-				{"lea",2,2,3},
-				{"not",1,0,3},
-				{"clr",1,0,3},
-				{"inc",1,0,3},
-				{"dec",1,0,3},
-				{"jmp",1,0,3},
-				{"bne",1,0,3},
-				{"red",1,0,3},
-				{"prn",1,0,4},
-				{"jsr",1,0,3},
-				{"rts",0,0,0},
-				{"stop",0,0,0},
-				{NULL,0,0,0}};
-static commandList _directive[]={
+}cmdList;
+/*לזיהוי סוג הפקודה*/
+static cmdList _action[]={{"mov"},
+				{"cmp"},
+				{"add"},
+				{"sub"},
+				{"lea"},
+				{"not"},
+				{"clr"},
+				{"inc"},
+				{"dec"},
+				{"jmp"},
+				{"bne"},
+				{"red"},
+				{"prn"},
+				{"jsr"},
+				{"rts"},
+				{"stop"},
+				{NULL}};
+static cmdList _directive[]={
            {".data"},
            {".string"},
            {".mat"},
            {".entry"},
            {".extern"}};
-
+/*לזיהוי סוג הפונקציה */
 int isDirective(char *command);
 int isAction(char *command);
 int isRegister(char *buf);
+/*לזיהוי תווית בתחילת שורה*/
 char * isLabel(char * buf,int *error,int line);
 
 /*chack if the line is a comment
@@ -79,10 +77,6 @@ for(i=0;i<5;i++)
     {
         if((strlen(_directive[i].name))==(functionLen)) 
             return i;
-        else 
-            {
-
-            }
     }
 }
     return NOT_EXIST;

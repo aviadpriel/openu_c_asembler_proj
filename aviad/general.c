@@ -617,7 +617,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
 
         if(secondRun==ON)
         {
-            addBinWord(binWordHead,&word,(*ic));
+            addBinWord(binWordHead,&word,(*ic));/*spsw*/
             catBinWordList(binWordHead,&binWordBuff,*ic);
             catExtEntList(extEntHead,&extEntBuff,*ic);
         }    

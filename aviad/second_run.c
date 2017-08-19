@@ -4,30 +4,27 @@
 #include<ctype.h>
 #include<stdlib.h>
 #include<string.h>
-
-void catBinWordList(binWordList **binWordHead,binWordList **binWordBuff,int curIC);
-int countrChars(char * word, char c, int line);
+/*פונקציות לזיהוי סוג הפונקציה*/
 int isComment(char * buff);
 int isEmpty(char * buff);
 int isDirective(char *command);
 int isAction(char *command);
-int isRegister(char *buf);
-int isImmediateAddressing(char * buff, int line);
-int isDirectiveAddressing(char * buff, int line);
-int isMatrix(char *buff,int line,int *r1,int *r2);
-int setBits(int data,char * type,binWord * word,int line);
-int updateEntry(char *label,labelsList **labelsHead,int line);
-void initWord(binWord *word);
-int binWordToInt(binWord *word);
-void addBinWord(binWordList **binWordHead,binWord *word,int address);
-void binWordToStrangeBase(binWord *addressWord,binWord *dataWord);
+/*פונקציה לזיהו תווית בתחילת שורה*/
+char * isLabel(char * buf,int *error,int line);
+/*סופר פונקציה שלב 2*/
+int identification(char * buff,int functionIndex,int line,int *ic,SWITCHER secondRun,binWordList **binWordHead,labelsList **labelsHead,extEntList **extEntHead);
+/*לעדכון תויות חצוניות */
+int isInTheList(char *label,labelsList **labelsHead,int line,int *externalFlag,extEntList **extEntHead,int address);
+/*פונקציות להדפסה */
+/*תשתמש בהן כדי לצור את הפונקציות של הפלט*/
 void printAndfree(binWordList *binWordHead);
 void printAndfreeData(dataList *dataHead);
-char * isLabel(char * buf,int *error,int line);
-int identification(char * buff,int functionIndex,int line,int *ic,SWITCHER secondRun,binWordList **binWordHead,labelsList **labelsHead,extEntList **extEntHead);
-void addExtEnt(extEntList **extEntHead,char *label,int address,DIRECRIVE_FUNCTION type);
-int isInTheList(char *label,labelsList **labelsHead,int line,int *externalFlag,extEntList **extEntHead,int address);
 
+/*פונקצית עזר לקובץ זה בלבד*/
+int updateEntry(char *label,labelsList **labelsHead,int line);
+/*
+
+*/
 int second_run(FILE *fp,labelsList **labelsHead,dataList **dataHead, char *file_name)
 {
     binWordList *binWordHead;
@@ -36,14 +33,14 @@ int second_run(FILE *fp,labelsList **labelsHead,dataList **dataHead, char *file_
     char *line;
     int lineCounter=1,ic2=INIT_IC;
     /*for print errors*/
-    /*Confirming the cursor to the beginning of the file*/
     binWordHead=NULL;
     extEntHead=NULL;
+    /*Confirming the cursor to the beginning of the file*/
     fseek(fp,0,SEEK_SET);
     line=(char *)malloc(sizeof(char)*LINE_LENGTH);
     if(!line)
     {
-      printf("out of memory");
+      printf("out of memory \n");
       exit(1);
     }
     while(fgets( line, LINE_LENGTH,fp))
@@ -88,12 +85,15 @@ int second_run(FILE *fp,labelsList **labelsHead,dataList **dataHead, char *file_
     }/*end of second big while*/
     if(errorFlag==ON)
     {
+      /*ביצוע שיחרור זכרון*/
         return ERROR;
     }
+    /*הוצעת קבצי פלט אם צריך*/
     printAndfree(binWordHead);
     printAndfreeData(*dataHead);
     return 0;
 }
+
 
 
 int updateEntry(char *label,labelsList **labelsHead,int line)
@@ -112,6 +112,7 @@ int updateEntry(char *label,labelsList **labelsHead,int line)
       {
       (*labelsHead)->entry=ON;
       entryFlag=ON;
+      break;
       }
     }
     labelsHead = &( (*labelsHead)->next);    
@@ -119,7 +120,7 @@ int updateEntry(char *label,labelsList **labelsHead,int line)
   /*chack if the label is declear in the file */
   if(entryFlag==OFF)
   {
-    printf("error:line %d:the label ( %s ) is not decleared in the file\n",line,label);
+    printf("Error:line %d:the label ( %s ) is not decleared in the file\n",line,label);
     return ERROR;
   }
 return 0;

@@ -1,11 +1,10 @@
+#include "consts.h"
 #include <math.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
 #include<ctype.h>
-#define WORD_SIZE 10
-#define ERROR -1
-#define LABEL_MAX_LEN 30
+
 #define OPCODE_SIZE 4
 #define ORGIN_SIZE 2
 #define DEST_SIZE 2
@@ -264,7 +263,7 @@ int decodeData(binWord * word,int data,int line)
     int mask2Bits=3,mask4Bits=15;
     if(data>=pow(2,WORD_SIZE) ||data<=-pow(2,WORD_SIZE))
     {
-        printf("error:line %d : the number %d is bigger than %d size",line,data,WORD_SIZE);
+        printf("Error:line %d : the number %d is bigger than %d size",line,data,WORD_SIZE);
         return ERROR;
     }
     word->era=data&mask2Bits;
@@ -288,6 +287,7 @@ void setBitsAddresOrImmediate(binWord * word,int data)
     word->opcode=data&mask4Bits;
 }
 
+/*no need for aviad*/
 int binWordToInt(binWord *word)
 {
     int intNum=0;
@@ -321,21 +321,11 @@ int setBits(int data,char * type,binWord * word,int line)
         }
         case 2:/*orgin*/
         {
-            if(data<0||data>3)
-            {
-                printf("programing error in line %d",line);
-                return ERROR;
-            } 
-            word->orgin=data;
+         word->orgin=data;
          break;   
         }
         case 3:/*destintion*/
         {
-            if(data<0||data>3)
-            {
-                printf("programing error in line %d",line);
-                return ERROR;
-            } 
             word->dest=data;
              break; 
                 
@@ -343,11 +333,6 @@ int setBits(int data,char * type,binWord * word,int line)
         }
         case 4:/*era*/
         {
-            if(data<0||data>3)
-            {
-                printf("programing error in line %d",line);
-                return ERROR;
-            } 
             word->era=data;
             break;  
         }
@@ -360,11 +345,6 @@ int setBits(int data,char * type,binWord * word,int line)
         case 7:/*opcode*/
         case 8:/*orginReg*/
         {
-            if(data<0||data>15)
-            {
-                printf("programing error in line %d",line);
-                return ERROR;
-            }
             word->opcode=data; 
             break;            
         }
@@ -378,7 +358,6 @@ int setBits(int data,char * type,binWord * word,int line)
         }
         default :
         {
-            printf("programing error in line %d",line);
             return ERROR;            
         }
     }
@@ -386,13 +365,14 @@ int setBits(int data,char * type,binWord * word,int line)
 
 }
 
-void binWordToStrangeBase(binWord *addressWord,binWord *dataWord)
+void binWordToStrangeBase(/*FILE *fp,*/binWord *addressWord,binWord *dataWord)
 {
     int intAddress=0,intData=0;
     char *base4 ={"abcd"};
     char address[5]={"\0"};
     char data[6]={"\0"};    
    
+    /*decode the address word*/
     intAddress=addressWord->opcode;
     intAddress&=3;
     address[0]=base4[intAddress];    
@@ -411,11 +391,11 @@ void binWordToStrangeBase(binWord *addressWord,binWord *dataWord)
     data[3]=base4[dataWord->dest];
     data[4]=base4[dataWord->era];
 
-
+      /*print to the screen*/
     printf("%s \t %s \n",address,data);
 }
 
-void printAndfree(binWordList *binWordHead)
+void printAndfree(/*FILE *fp,*/binWordList *binWordHead)
 {
    binWordList* temp;
    binWord addressWord;
@@ -426,13 +406,14 @@ void printAndfree(binWordList *binWordHead)
            binWordHead = binWordHead->next;            
            temp ->next=NULL;
            setBits(temp->address,"number",&addressWord,0);                    
-           binWordToStrangeBase(&addressWord,&(temp->word));
+           binWordToStrangeBase(/*fp,*/&addressWord,&(temp->word));
            free(temp);
        }
    
 }
 
-void printAndfreeData(dataList *dataHead)
+
+void printAndfreeData(/*FILE *fp,*/dataList *dataHead)
 {
    binWord dataWord,addressWord;
    dataList *temp;
@@ -449,7 +430,7 @@ void printAndfreeData(dataList *dataHead)
        address=temp->address;
        setBits(data,"number",&dataWord,0);
        setBits(address,"number",&addressWord,0);        
-       binWordToStrangeBase(&addressWord,&dataWord);
+       binWordToStrangeBase(/*fp,*/&addressWord,&dataWord);
        free(temp);
    }
 
@@ -485,6 +466,7 @@ void addExtEnt(extEntList **extEntHead,char *label,int address,DIRECRIVE_FUNCTIO
   }
 *extEntHead = newExtEnt(label,address,type);
 }
+
 
 void catExtEntList(extEntList **extEntHead,extEntList **extEntBuff,int ic)
 {
