@@ -5,7 +5,35 @@
  Semester    : 2017b
  Description : the function which runs the first part of the algorithm
  ============================================================================
-pasado-code of function first_run
+*/
+#include "consts.h"
+#include "struct.h"
+#include<stdio.h>
+#include<ctype.h>
+#include<stdlib.h>
+#include<string.h>
+/*פונקציות לזיהוי סוג הפונקציה*/
+int isComment(char * buff);
+int isDirective(char *command);
+int isAction(char *command);
+/*סופר פונקציה שלב 1*/
+int identification(char * buff,int functionIndex,int line,int *ic,SWITCHER secondRun,binWordList **binWordHead,labelsList **labelsHead,extEntList **extEntHead);
+/*פונקציות לטיפול בפונקנציות הנחייה*/
+#define DIRECTIVE_OPERETORS
+int dataF(char *command, char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line);
+int stringF(char *command,char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line);
+int matF(char *command,char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line);
+int externF(char *buff,char *label,labelsList **labelsHead,int line);
+int entryF(char * buff,char *label,int line);
+/*פונקציה לזיהו תווית בתחילת שורה*/
+char * isLabel(char * buf,int *error,int line);
+/*פונקציות עזר רק לקובץ זה*/
+void updateDataLabel(labelsList **labelsHead,int curIc);
+void updateDataList(dataList **dataHead,int curIc);
+
+
+/*
+algorithm of function first_run
 1. If a null is returned, go to 8
 2. If it is an empty row or a note line, return to 1
 3. Take a word from the line
@@ -23,29 +51,6 @@ Remarks
   2. Tests of the actions functions are performed in 
 3. Related operations = (in the health + housing + assignment in data structures + calculation of ic / dc)
 */
-#include "consts.h"
-#include "struct.h"
-#include<stdio.h>
-#include<ctype.h>
-#include<stdlib.h>
-#include<string.h>
-
-/*evgeny : Declaration of functions that must be written (in another file)*/
-int isComment(char * buff);
-int isDirective(char *command);
-int isAction(char *command);
-int isRegister(char *buf);
-int identification(char * buff,int functionIndex,int line,int *ic,SWITCHER secondRun,binWordList **binWordHead,labelsList **labelsHead,extEntList **extEntHead);
-int dataF(char *command, char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line);
-int stringF(char *command,char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line);
-int matF(char *command,char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line);
-int externF(char *buff,char *label,labelsList **labelsHead,int line);
-int entryF(char * buff,char *label,int line);
-void updateDataLabel(labelsList **labelsHead,int curIc);
-void updateDataList(dataList **dataHead,int curIc);
-
-char * isLabel(char * buf,int *error,int line);
-
 int first_run(FILE *fp,labelsList **labelsHead,dataList **dataHead,int *dc,int *ic)
 {
 
@@ -171,7 +176,7 @@ int first_run(FILE *fp,labelsList **labelsHead,dataList **dataHead,int *dc,int *
     else /*unligal stetment print error*/
     {
       errorFlag=ON;      
-      printf("evgeny put a normal error messege: %s \n",buff);
+      printf("Error:unligal stetment print error %s \n",buff);
     }
 
     lineCounter++;
@@ -181,7 +186,7 @@ free(line);
 
 if(*dc==0 && *ic==INIT_IC)/*chack if is no a empty file */
   {
-    printf("this is a emty file \n");
+    printf("Error:this is an empty file \n");
       return ERROR;
   } 
   else if(errorFlag== OFF)

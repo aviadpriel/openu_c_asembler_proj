@@ -10,8 +10,13 @@ what to include inside wrapper?
 
 //write evreythig needed for stage1 header
 #include "general.h"
-#include "errors.h"
 
-first_run(file);
+int dataF(char *command, char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line);
+int stringF(char *command,char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line);
+int matF(char *command,char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line);
+int externF(char *buff,char *label,labelsList **labelsHead,int line);
+int entryF(char * buff,char *label,int line);
+void updateDataLabel(labelsList **labelsHead,int curIc);
+void updateDataList(dataList **dataHead,int curIc);
 
 #endif /*end of STAGE1_H*/

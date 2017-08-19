@@ -49,7 +49,7 @@ int main(int argc, char *argv[])
             printf("file \"%s\" compile failed.\n continue to next file.\n", file_name);
             continue;
         }
-        second_run(fp, &l_head, &d_head, file_name);
+        second_run(fp, &l_head, &d_head,argv[i]);
         fclose(fp);
         free(file_name);
     }/*end of if*/

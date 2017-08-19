@@ -1,11 +1,11 @@
-main.out:main.o isSomsing.o testfunction.o prog_struct.o first_run.o second_run.o general.o
-	gcc -g -ansi -Wall -pedantic main.o general.o first_run.o second_run.o isSomsing.o testfunction.o prog_struct.o -o main.out
+main.out:main.o isSomsing.o direrctiveTestfunction.o prog_struct.o first_run.o second_run.o general.o
+	gcc -g -ansi -Wall -pedantic main.o general.o first_run.o second_run.o isSomsing.o direrctiveTestfunction.o prog_struct.o -o main.out
 
 isSomsing.o:isSomsing.c
 	gcc -g -ansi -Wall -pedantic -c isSomsing.c
 
-testfunction.o:testfunction.c
-	gcc -g -ansi -Wall -pedantic -c testfunction.c
+direrctiveTestfunction.o:direrctiveTestfunction.c
+	gcc -g -ansi -Wall -pedantic -c direrctiveTestfunction.c
 
 first_run.o:first_run.c struct.h
 	gcc -g -ansi -Wall -pedantic -c first_run.c

@@ -1,19 +1,26 @@
+/*
+ ============================================================================
+ ============================= Maman 14 =====================================
+ File Name   : first_run.c
+ Semester    : 2017b
+ Description : the function which runs the first part of the algorithm
+ ============================================================================
+ */
 #include "struct.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
 #include "consts.h"
-int isDirectiveAddressing(char * buff,int line);/*from isSome.c*/
+#include "general.h"
 int countrChars(char *word, char c,int line);
-int isEmpty(char * buff);/*from isSomsing.c*/
 int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc,int line);
 
 /*The operator of .data function
 * Enters the data into the dataList
-* and if label!=NULL it enters it to the labelsList
+* and if label!=NULL it enters it to the labelsList With DATA flag 
 * return ERROR if have some error 
-  else return TRUE 
+* else return TRUE 
 */
 int dataF(char *command, char *label,int *dc, dataList **dataHead, labelsList **labelsHead,int line)
 {
@@ -130,6 +137,7 @@ int stringF(char *command, char *label, int *dc, dataList **dataHead, labelsList
 * and if label!=NULL it enters it to the labelsList
 * return ERROR if have some error 
 * else return TRUE 
+*צריך לשים הודעות שגיעה נורמליות
 */
 int matF(char *buff,char *label,int *dc,dataList **dataHead,labelsList **labelsHead,int line)
 {
@@ -366,7 +374,7 @@ True if there are no errors
 An auxiliary function that takes a list of numbers
 Separated by a comma and inserted into a datalist
 Used in .mat and .data
-Returns
+Returns  
 Error if there is any error.
 True if there are no errors
 */
@@ -377,7 +385,7 @@ int commaList(dataList **dataHead, char *command, int cummaCounter, int *dc,int 
   /*get the data to the Datalist*/
   if(*command==',')
   {
-    printf("error:line %d evgeny \n",line);
+    printf("Error:line %d:input must begin with a integer value \n",line);
     return ERROR;
   }
   cp = strtok(command, ",");
