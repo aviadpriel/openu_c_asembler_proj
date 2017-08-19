@@ -1,13 +1,15 @@
 
 
+#ifndef EXTENTLIST
+#define EXTENTLIST
 typedef struct extEntList{
   char *label;
   int address;
   DIRECRIVE_FUNCTION type;
   struct extEntList *next;
-
 }extEntList;
 
+#endif
 void initWord(binWord *word);
 
 int countrChars(char *word, char c,int line);

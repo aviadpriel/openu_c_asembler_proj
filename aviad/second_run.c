@@ -5,12 +5,6 @@
 #include<stdlib.h>
 #include<string.h>
 
-typedef struct extEntList{
-    char *label;
-    int address;
-    DIRECRIVE_FUNCTION type;
-    struct extEntList *next;
-  }extEntList;
 void catBinWordList(binWordList **binWordHead,binWordList **binWordBuff,int curIC);
 int countrChars(char * word, char c, int line);
 int isComment(char * buff);
@@ -99,4 +93,34 @@ int second_run(FILE *fp,labelsList **labelsHead,dataList **dataHead, char *file_
     printAndfree(binWordHead);
     printAndfreeData(*dataHead);
     return 0;
+}
+
+
+int updateEntry(char *label,labelsList **labelsHead,int line)
+{
+  SWITCHER entryFlag=OFF;
+  int i=0,functionLen;
+  while(isspace(*label)){label++;}
+  while(!isspace(label[i])&&label[i]!='\0'){i++;}
+  functionLen = i;
+  /* insert using a loop and pointer to pointer*/
+  while(*labelsHead)
+  {
+    if(strncmp(label,(*labelsHead)->label,strlen((*labelsHead)->label))==0)/*need to update the entry flag */
+    {
+      if(functionLen==strlen((*labelsHead)->label))
+      {
+      (*labelsHead)->entry=ON;
+      entryFlag=ON;
+      }
+    }
+    labelsHead = &( (*labelsHead)->next);    
+  }
+  /*chack if the label is declear in the file */
+  if(entryFlag==OFF)
+  {
+    printf("error:line %d:the label ( %s ) is not decleared in the file\n",line,label);
+    return ERROR;
+  }
+return 0;
 }
