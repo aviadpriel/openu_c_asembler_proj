@@ -21,6 +21,7 @@ void output_entry(char *file_name)
     char *output_name = NULL;
     modify_output_name(file_name, "ENT_SUFFIX", output_name)
     //creating 4 base output.
+    FILE *fp = fopen(output_name,"w");
     free(output_name);
 }
 
@@ -29,6 +30,7 @@ void output_extern(char *file_name)
     char *output_name = NULL;
     modify_output_name(file_name, "EXT_SUFFIX", output_name)
     //creating 4 base output.
+    FILE *fp = fopen(output_name,"w");
     free(output_name);
 }
 
@@ -37,6 +39,7 @@ void output_object(char *file_name)
     char *output_name = NULL;
     modify_output_name(file_name, "OB_SUFFIX", output_name)
     //creating 4 base output.
+    FILE *fp = fopen(output_name,"w");
     free(output_name);
 }
 
@@ -48,7 +51,7 @@ void output_object(char *file_name)
 	*Return: pointer to relevant output file name.
 	*Description: it takes the current file name and adds the relevant suffix for a new file to be created (.ob, .ext, .ent).
 *****************************************************************************************************************************************************/
-char *modify_output_name(char *file_name, char *suffix, char *output_name)
+void modify_output_name(char *file_name, char *suffix, char *output_name)
 {
     output_name = (char*)malloc(sizeof(char) * (strlen(file_name) + strlen(suffix)));
     if(!file_name)
@@ -57,6 +60,5 @@ char *modify_output_name(char *file_name, char *suffix, char *output_name)
             return NULL;
         }
     strcpy(output_name, file_name);
-    strcat(file_name,suffix);
-    return output_name;
+    strcat(output_name, suffix);
 }
