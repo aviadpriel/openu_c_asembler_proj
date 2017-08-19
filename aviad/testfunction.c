@@ -44,7 +44,7 @@ int dataF(char *command, char *label,int *dc, dataList **dataHead, labelsList **
   if (label)
   {
     int num = addLabel(labelsHead,label,OFF,OFF,ON,OFF,currDc,line);
-    if (!num)
+    if (num==ERROR)
     {
       return ERROR;
     }
@@ -113,7 +113,7 @@ int stringF(char *command, char *label, int *dc, dataList **dataHead, labelsList
   if (label)
   {
     int num = addLabel(labelsHead, label, OFF, OFF,ON,OFF,currDc,line);
-    if (!num)
+    if (num==ERROR)
     {
       return ERROR;
     }
@@ -264,7 +264,7 @@ printf("error:line %d: in .mat [num1][num2] format\n",line);
   if (label)
   {
     int num = addLabel(labelsHead,label,OFF,OFF,ON,OFF,currDc,line);
-    if (!num)
+    if (num==ERROR)
     {
       return ERROR;
     }

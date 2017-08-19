@@ -6,6 +6,10 @@
 #define WORD_SIZE 10
 #define ERROR -1
 #define LABEL_MAX_LEN 30
+#define OPCODE_SIZE 4
+#define ORGIN_SIZE 2
+#define DEST_SIZE 2
+#define ERA_SIZE 2
 /*for bin word*/
 typedef struct bitType{
   char * type;
@@ -25,23 +29,26 @@ typedef struct bitType{
   {"destReg",2,5},
   {NULL,ERROR,ERROR}};     
 
-
-typedef enum {ON,OFF,WAIT} SWITCHER;
-typedef enum {DATA=0,STRING=1,MATRIXF=2,ENTRY=3,EXTERN=4} DIRECRIVE_FUNCTION;
-
+  #ifndef SWITCHER_1
+  #define SWITCHER_1
+  typedef enum {ON,OFF,WAIT} SWITCHER;
+  typedef enum {DATA=0,STRING=1,MATRIXF=2,ENTRY=3,EXTERN=4} DIRECRIVE_FUNCTION;
+  #endif
+  
 typedef struct extEntList{
   char *label;
   int address;
   DIRECRIVE_FUNCTION type;
   struct extEntList *next;
 }extEntList;
-void addExtEnt(extEntList **extEntHead,char *label,int address,DIRECRIVE_FUNCTION type);
+void addExtEnt(extEntList **extEntHead,char *label,int address,DIRECRIVE_FUNCTION type);/*נשארת פה*/
 
+/*מייצג מילה בגודל 10*/
 typedef struct binWord{
- unsigned int opcode:4;
- unsigned int orgin:2;
- unsigned int dest:2;
- unsigned int era:2;
+ unsigned int opcode:OPCODE_SIZE;
+ unsigned int orgin:ORGIN_SIZE;
+ unsigned int dest:DEST_SIZE;
+ unsigned int era:ERA_SIZE;
   }binWord; 
 
   typedef struct binWordList{
@@ -59,17 +66,12 @@ SWITCHER external;
 int address;
 struct labelsList *next;
 } labelsList;
+
 typedef struct dataList{
 int data:WORD_SIZE;
 int address;
 struct dataList *next;
 }dataList;
-typedef struct commandList{
-char *name;  
-int operends;
-int operendGroup;
-}commandList;
-
 
 
 /************dataList functions*******/
@@ -94,7 +96,6 @@ void insertData(dataList **dataHead,int data,int address)
   if(!(*dataHead))
   {
   (*dataHead)=newData(data,address);
-
   }
   else
     {
@@ -160,8 +161,9 @@ int addLabel(labelsList **labelsHead,char *label,SWITCHER action,SWITCHER extern
     }
   }
   *labelsHead = newLabel(label,address,action,external,data,entry);
-  return 1;
+  return 0;
 }
+
 
 void freeLabelsList(labelsList *labelsHead)
 {
@@ -175,48 +177,10 @@ void freeLabelsList(labelsList *labelsHead)
     }
 }
 
-int updateEntry(char *label,labelsList **labelsHead,int line)
-{
-  SWITCHER entryFlag=OFF;
-  int i=0,functionLen;
-  while(isspace(*label)){label++;}
-  while(!isspace(label[i])&&label[i]!='\0'){i++;}
-  functionLen = i;
-  /* insert using a loop and pointer to pointer*/
-  while(*labelsHead)
-  {
-    if(strncmp(label,(*labelsHead)->label,strlen((*labelsHead)->label))==0)/*need to update the entry flag */
-    {
-      if(functionLen==strlen((*labelsHead)->label))
-      {
-      (*labelsHead)->entry=ON;
-      entryFlag=ON;
-      }
-    }
-    labelsHead = &( (*labelsHead)->next);    
-  }
-  /*chack if the label is declear in the file */
-  if(entryFlag==OFF)
-  {
-    printf("error:line %d:the label ( %s ) is not decleared in the file\n",line,label);
-    return ERROR;
-  }
-return 0;
-}
+/**********************************/
 
-void updateDataLabel(labelsList **labelsHead,int curIc)
-{
-  while(*labelsHead)
-  {
-    if((*labelsHead)->data==ON)
-    {
-      (*labelsHead)->address+=curIc;
-    }
-    labelsHead = &( (*labelsHead)->next);    
-  }
-}
-/*************************************************/
 /* binWord functions   */
+
 binWordList* newBinWord(binWord word,int address)
 {
   binWordList *p = (binWordList*)malloc(sizeof(binWordList));
@@ -238,23 +202,7 @@ void addBinWord(binWordList **binWordHead,binWord *word,int address)
   {
     binWordHead = &( (*binWordHead)->next);
   }
-*binWordHead = newBinWord(*word,address);
-}
-
-void catBinWordList(binWordList **binWordHead,binWordList **binWordBuff,int curIC)
-{
-  int add=curIC+1; 
-  while(*binWordHead)
-  {
-    binWordHead = &( (*binWordHead)->next);
-  }
-  *binWordHead=*binWordBuff;
-  while(*binWordHead)
-  {
-    (*binWordHead)->address=add;
-    binWordHead = &( (*binWordHead)->next);
-    add++;    
-  }  
+  *binWordHead = newBinWord(*word,address);
 }
 
 int isInTheList(char *label,labelsList **labelsHead,int line,int *externalFlag,extEntList **extEntHead,int address)
@@ -304,6 +252,7 @@ int isInTheList(char *label,labelsList **labelsHead,int line,int *externalFlag,e
            return ERROR;
    
 }
+
 void initWord(binWord *word)
 {
    word->opcode=word->orgin=word->dest=word->era=0;      

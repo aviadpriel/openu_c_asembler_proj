@@ -3,7 +3,10 @@
 
 #ifndef SWITCHER_1
 #define SWITCHER_1
+
 typedef enum {ON,OFF,WAIT} SWITCHER;
+typedef enum {DATA=0,STRING=1,MATRIXF=2,ENTRY=3,EXTERN=4} DIRECRIVE_FUNCTION;
+
 #endif
 
 #ifndef LABELS_LIST_1
@@ -65,5 +68,18 @@ typedef struct binWord{
 }binWordList;
 
 #endif
+
+#ifndef EXTENTLIST
+#define EXTENTLIST
+typedef struct extEntList{
+  char *label;
+  int address;
+  DIRECRIVE_FUNCTION type;
+  struct extEntList *next;
+}extEntList;
+
+#endif
+
+
 
 

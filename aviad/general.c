@@ -628,3 +628,22 @@ if(_action[functionIndex].operends==0)/*if no operends*/
     return ERROR;
 }
 
+/*
+מחברת 2 מבני נתונים מסוג 
+binWordList
+*/
+void catBinWordList(binWordList **binWordHead,binWordList **binWordBuff,int curIC)
+{
+  int add=curIC+1; 
+  while(*binWordHead)
+  {
+    binWordHead = &( (*binWordHead)->next);
+  }
+  *binWordHead=*binWordBuff;
+  while(*binWordHead)
+  {
+    (*binWordHead)->address=add;
+    binWordHead = &( (*binWordHead)->next);
+    add++;    
+  }  
+}
