@@ -440,7 +440,7 @@ if(_action[functionIndex].operends==0)/*if no operends*/
                     initWord(&labelMetrix);
                     initWord(&regMetrix);
          
-                    if((address=isInTheList(buff,labelsHead,line,&externalFlag,&extEntBuff,binWordCunter))==ERROR)
+                    if((address=isInTheList(tok,labelsHead,line,&externalFlag,&extEntBuff,binWordCunter))==ERROR)
                     return ERROR;
                         
                     setBits(2,"destin",&word,line);

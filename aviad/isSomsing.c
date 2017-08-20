@@ -244,8 +244,8 @@ int isDirectiveAddressing(char * buff,int line)
     return ERROR;
   }
     
-    while (isspace(buff[i])&&buff[i]!='\n') {i++;}/**/
-    if(buff[i]!='\0')
+    while (isspace(buff[i])&&buff[i]!='\n'&&buff[i]!='[') {i++;}/**/
+    if(buff[i]!='\0'&&buff[i]!='[')
     {
     printf("error !!! = %c  \n",buff[i]) ;   
     return ERROR;

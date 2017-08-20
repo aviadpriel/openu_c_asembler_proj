@@ -30,7 +30,7 @@ int main(int argc, char *argv[])
 
     if (argc == 1)
     {
-        printf("No arguments were given");
+        printf("No arguments were given \n");
         exit(1);
     }
     /*every new loop run is a different file.as*/
