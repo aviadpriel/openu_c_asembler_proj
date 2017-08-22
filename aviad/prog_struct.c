@@ -395,6 +395,32 @@ void binWordToStrangeBase(/*FILE *fp,*/binWord *addressWord,binWord *dataWord)
     printf("%s \t %s \n",address,data);
 }
 
+void freeBinWordList(binWordList *binWordHead)
+{
+   binWordList* temp;
+       while (binWordHead != NULL)
+       {    
+           temp = binWordHead; 
+           binWordHead = binWordHead->next;            
+           temp ->next=NULL;                  
+           free(temp);
+       }
+   
+}
+
+void freeExtEntList(extEntList *extEntHead)
+{
+  extEntList* temp;
+       while (extEntHead != NULL)
+       {    
+           temp = extEntHead; 
+           extEntHead = extEntHead->next;            
+           temp ->next=NULL;                  
+           free(temp);
+       }
+   
+}
+
 void printAndfree(/*FILE *fp,*/binWordList *binWordHead)
 {
    binWordList* temp;

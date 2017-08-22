@@ -25,6 +25,11 @@ int updateEntry(char *label,labelsList **labelsHead,int line);
 /*
 
 */
+/*פונקציות לשחרור זכרון במקרה ויש תקלה כלשהי*/
+void freeBinWordList(binWordList *binWordHead);
+void freeExtEntList(extEntList *extEntHead);
+
+
 int second_run(FILE *fp,labelsList **labelsHead,dataList **dataHead, char *file_name)
 {
     binWordList *binWordHead;
@@ -86,6 +91,10 @@ int second_run(FILE *fp,labelsList **labelsHead,dataList **dataHead, char *file_
     if(errorFlag==ON)
     {
       /*ביצוע שיחרור זכרון*/
+    freeDataList(*dataHead);
+    freeLabelsList(*labelsHead);
+    freeBinWordList(binWordHead);
+    freeExtEntList(extEntHead);
         return ERROR;
     }
     /*הוצעת קבצי פלט אם צריך*/
