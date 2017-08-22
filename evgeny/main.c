@@ -6,10 +6,12 @@
 #include "consts.h"
 #include "struct.h"
 
-#define LINE_ARG_SUFFIX 3
+#define LINE_ARG_SUFFIX 4
+int first_run(FILE *fp,labelsList **labelsHead,dataList **dataHead,int *dc,int *ic);
+int second_run(FILE *fp,labelsList **labelsHead,dataList **dataHead, char *file_name,int DC, int IC);
 
 /*adds suffix ".as" to command line argument name*/
-void modify_name(char *file_name, int size, char *argv);
+void modify_name(char **file_name, int size, char *argv);
 
 /*****************************************************************************************************************************************************
 	*Function: int main(...)
@@ -34,7 +36,7 @@ int main(int argc, char *argv[])
     /*every new loop run is a different file.as*/
     for(i = 1; i < argc; i++)
     {
-        modify_name(file_name,(strlen(argv[i]) + LINE_ARG_SUFFIX),argv[i]);
+        modify_name(&file_name,(strlen(argv[i]) + LINE_ARG_SUFFIX),argv[i]);
         fp = fopen(file_name, "r");
         if(!fp)
             {
@@ -47,7 +49,7 @@ int main(int argc, char *argv[])
             printf("file \"%s\" compile failed.\n continue to next file.\n", file_name);
             continue;
         }
-        second_run(fp, &l_head, &d_head, file_name);
+        second_run(fp, &l_head, &d_head,argv[i], DC, IC);
         fclose(fp);
         free(file_name);
     }/*end of if*/
@@ -63,14 +65,14 @@ int main(int argc, char *argv[])
 	*return: none
 	*Description: gets the command line argument file name and adds the suffix ".as"
 *****************************************************************************************************************************************************/
-void modify_name(char *file_name, int size, char *argv)
+void modify_name(char **file_name, int size, char *argv)
 {
-    file_name = (char*)malloc(sizeof(char) * size);
+    *file_name = (char*)malloc(sizeof(char) * size);
         if(!file_name)
             {
                 printf("memmory allocation failed\n");
                 return;
             }
-    strcpy(file_name, argv);
-    strcat(file_name,".as");
+    strcpy(*file_name, argv);
+    strcat(*file_name,".as\0");
 }
