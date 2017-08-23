@@ -28,7 +28,8 @@ void printAndfreeData(FILE *ofp, dataList *dataHead);
 /*פונקצית עזר לקובץ זה בלבד*/
 int updateEntry(char *label,labelsList **labelsHead,int line);
 void modify_output_name(char *file_name, char *suffix, char **output_name);
-void output_object(char *file_name, binWordList *binWordHead, dataList *dataHead);
+void output_object(char *file_name, binWordList *binWordHead, dataList *dataHead, int IC, int DC);
+void int_to_strange(FILE *ofp, int IC, int DC);
 /*
 
 */
@@ -96,7 +97,7 @@ int second_run(FILE *fp,labelsList **labelsHead,dataList **dataHead, char *file_
         return ERROR;
     }
     /*הוצעת קבצי פלט אם צריך*/
-    output_object(file_name, binWordHead, *dataHead);
+    output_object(file_name, binWordHead, *dataHead, IC, DC);
     /*if(extEntList)//creates .ent and .ext files if needed
     {
 
@@ -145,14 +146,14 @@ return 0;
 	*Return:      pointer to relevant output file name.
 	*Description: it takes the current file name and adds the relevant suffix for a new file to be created (.ob, .ext, .ent).
 *****************************************************************************************************************************************************/
-void output_object(char *file_name, binWordList *binWordHead, dataList *dataHead)
+void output_object(char *file_name, binWordList *binWordHead, dataList *dataHead, int IC, int DC)
 {
     char *output_name = NULL;
     FILE *ofp = NULL;
     modify_output_name(file_name, OB_SUFFIX, &output_name);
     ofp = fopen(output_name,"w");
-    fprintf(ofp, "Base 4 \t Base 4 \nadress  machine-code\n\n");
-    /*להשלים הדפסה של IC ו DC בבסיס ארבע מוזר*/
+    fprintf(ofp, "Base 4 \t Base 4 \nadress  machine-code\n");
+    int_to_strange(ofp, IC - INIT_IC , DC);
     printAndfree(ofp, binWordHead);
     printAndfreeData(ofp, dataHead);
     free(output_name);
@@ -211,4 +212,35 @@ void modify_output_name(char *file_name, char *suffix, char **output_name)
         }
     strcpy(*output_name, file_name);
     strcat(*output_name, suffix);
+}
+
+/*int to strange base for IC\DC*/
+void int_to_strange(FILE *ofp, int IC,int DC)
+{
+    char ic_adress[5];/*max memmory size is represented by 5 "digits"(256 == baaaa)*/
+    char dc_adress[5];
+	char base4[] = {"abcd"};
+    int i = strlen(dc_adress) - 1;
+    int j = strlen(dc_adress) - 1;
+    ic_adress[5] = '\0';
+    dc_adress[5] = '\0';
+    if(!IC)/*case no memmory in usage*/
+        ic_adress[i--] = 'a';
+	while(i >= 0 && IC)
+	{
+		ic_adress[i] = base4[IC % 4];
+		IC /= 4;
+		i--;
+    }
+    if(!DC)/*case no memmory in usage*/
+    dc_adress[i--] = 'a';
+    while(j >= 0 && DC)
+	{
+		dc_adress[j] = base4[DC % 4];
+		DC /= 4;
+		j--;
+    }
+    i++;
+    j++;
+    fprintf(ofp, " %s \t %s\n\n", (ic_adress + i), (dc_adress + j));
 }
