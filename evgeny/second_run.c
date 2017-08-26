@@ -30,6 +30,7 @@ int updateEntry(char *label,labelsList **labelsHead,int line);
 void modify_output_name(char *file_name, char *suffix, char **output_name);
 void output_object(char *file_name, binWordList *binWordHead, dataList *dataHead, int IC, int DC);
 void int_to_strange(FILE *ofp, int IC, int DC);
+void int_to_strange2(FILE *exfp,char *label, int adress);
 /*
 
 */
@@ -98,14 +99,45 @@ int second_run(FILE *fp,labelsList **labelsHead,dataList **dataHead, char *file_
     }
     /*הוצעת קבצי פלט אם צריך*/
     output_object(file_name, binWordHead, *dataHead, IC, DC);
-    /*if(extEntList)//creates .ent and .ext files if needed
+    if(extEntHead)/*creates .ent and .ext files if needed*/
     {
+        extEntList *extEntCurr = extEntHead;
+        FILE *enfp = NULL;
+        FILE *exfp = NULL;
+        char *ent_name = NULL;
+        char *ext_name = NULL;
+        while(extEntCurr)
+        {
+            if(extEntCurr->type == ENTRY)
+            {
+                if(!ent_name)
+                {
+                    modify_output_name(file_name, ENT_SUFFIX, &ent_name);
+                    enfp = fopen(ent_name,"w");
+                }
+                int_to_strange2(enfp, extEntCurr -> label, extEntCurr -> address);
+            }
+            else
+            {
+                if(!ext_name)
+                {
+                    modify_output_name(file_name, EXT_SUFFIX, &ext_name);
+                    exfp = fopen(ext_name,"w");
+                }
+                int_to_strange2(exfp, extEntCurr -> label, extEntCurr -> address);
+            }
 
+            extEntCurr = extEntCurr->next;
+        }/*end of extEntCurr while*/
+        free(ent_name);
+        if(enfp)
+            fclose(enfp);
+        free(ext_name);
+        if(exfp)
+            fclose(exfp);
     }
-    */
     return 0;
 }
-
 
 
 int updateEntry(char *label,labelsList **labelsHead,int line)
@@ -161,40 +193,6 @@ void output_object(char *file_name, binWordList *binWordHead, dataList *dataHead
 }
 
 /*****************************************************************************************************************************************************
-	*Function:    void output_object(...)
-  *Input:       char *file_name- the current file name to be assembeled.
-                char *suffix- the suffix to current file name deppending on file creation type (.ob, .ext, .entry)
-                char *output_name pointer which will point to relevant file name to be created.
-	*Return:      pointer to relevant output file name.
-	*Description: it takes the current file name and adds the relevant suffix for a new file to be created (.ob, .ext, .ent).
-*****************************************************************************************************************************************************/
-/*void output_entry(char *file_name)
-{
-    char *output_name = NULL;
-    modify_output_name(file_name, "ENT_SUFFIX", output_name)
-    //creating 4 base output.
-    FILE *fp = fopen(output_name,"w");
-    free(output_name);
-}*/
-
-/*****************************************************************************************************************************************************
-	*Function:    void output_object(...)
-  *Input:       char *file_name- the current file name to be assembeled.
-                char *suffix- the suffix to current file name deppending on file creation type (.ob, .ext, .entry)
-                char *output_name pointer which will point to relevant file name to be created.
-	*Return:      pointer to relevant output file name.
-	*Description: it takes the current file name and adds the relevant suffix for a new file to be created (.ob, .ext, .ent).
-*****************************************************************************************************************************************************/
-/*void output_extern(char *file_name)
-{
-    char *output_name = NULL;
-    modify_output_name(file_name, "EXT_SUFFIX", output_name)
-    //creating 4 base output.
-    FILE *fp = fopen(output_name,"w");
-    free(output_name);
-}*/
-
-/*****************************************************************************************************************************************************
 	*Function:    void modify_output_name(...)
     *Input:     char *file_name- the current file name to be assembeled.
                 char *suffix- the suffix to current file name deppending on file creation type (.ob, .ext, .entry)
@@ -240,7 +238,21 @@ void int_to_strange(FILE *ofp, int IC,int DC)
 		DC /= 4;
 		j--;
     }
-    i++;
-    j++;
-    fprintf(ofp, " %s \t %s\n\n", (ic_adress + i), (dc_adress + j));
+    fprintf(ofp, " %s \t %s\n\n", (ic_adress + ++i), (dc_adress + ++j));
+}
+
+/*int to strange for .ent and .ex*/
+void int_to_strange2(FILE *exfp,char *label, int adress)
+{
+    char l_adress[6];/*max memmory size is represented by 5 "digits"(256 == baaaa)*/
+	char base4[] = {"abcd"};
+    int i = strlen(l_adress) - 1;
+    l_adress[6] = '\0';
+	while(i >= 0 && adress)
+	{
+		l_adress[i] = base4[adress % 4];
+		adress /= 4;
+		i--;
+    }
+    fprintf(exfp, "%s\t%s\n", label, (l_adress + ++i));
 }

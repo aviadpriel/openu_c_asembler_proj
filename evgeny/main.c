@@ -12,6 +12,8 @@ int second_run(FILE *fp,labelsList **labelsHead,dataList **dataHead, char *file_
 
 /*adds suffix ".as" to command line argument name*/
 void modify_name(char **file_name, int size, char *argv);
+void freeList(labelsList *l_head);
+/*void freeData(dataList *d_head);*/
 
 /*****************************************************************************************************************************************************
 	*Function: int main(...)
@@ -36,6 +38,8 @@ int main(int argc, char *argv[])
     /*every new loop run is a different file.as*/
     for(i = 1; i < argc; i++)
     {
+        l_head = NULL;
+        d_head = NULL;
         modify_name(&file_name,(strlen(argv[i]) + LINE_ARG_SUFFIX),argv[i]);
         fp = fopen(file_name, "r");
         if(!fp)
@@ -51,8 +55,10 @@ int main(int argc, char *argv[])
         }
         second_run(fp, &l_head, &d_head,argv[i], DC, IC);
         fclose(fp);
+        freeList(l_head);
+        /*freeData(d_head);*/
         free(file_name);
-    }/*end of if*/
+    }/*end of for*/
     printf("assembly is finished.\nValid files has been processed successfully.\n");
     return 0;
 }
@@ -76,3 +82,25 @@ void modify_name(char **file_name, int size, char *argv)
     strcpy(*file_name, argv);
     strcat(*file_name,".as\0");
 }
+
+void freeList(labelsList *l_head)
+{
+    labelsList *temp;
+    while(l_head)
+    {
+        temp = l_head->next;
+        free(l_head);
+        l_head = temp;
+    }
+}
+
+/*void freeData(dataList *d_head)
+{
+    dataList *temp;
+    while(d_head)
+    {
+        temp = d_head->next;
+        free(d_head);
+        d_head = temp;
+    }
+}*/

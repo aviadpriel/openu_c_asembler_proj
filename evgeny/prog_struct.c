@@ -391,7 +391,7 @@ void binWordToStrangeBase(FILE *fp, binWord *addressWord,binWord *dataWord)
     data[3]=base4[dataWord->dest];
     data[4]=base4[dataWord->era];
 
-      /*print to the screen*/
+      /*print to file*/
     fprintf(fp, "%s \t %s \n",address,data);
 }
 

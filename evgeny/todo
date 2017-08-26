@@ -1,10 +1,14 @@
-main template- check
-data structures-
-first run template- check A
-fisrt run specal functions- check A
-first run error handling- check(need debug)A
-second run template-
-second run special function-
-second run error handling-
-improvements(efficiency, records itc)-
-beer with aviad-
+function from 3/8/15
+int isdirective(char *command); check
+int isAction(char *command); check
+int isLabel(char *command);check check 
+*********************************************
+בדיקת באגים בריצה ראשונה + כתיבת פונקציה לזיהוי הערות בקובץ 1
+2 תיעוד מסודר
+3 שינוי מספרי קסם
+4יעול פונקציות 
+
+1. 
+{
+    1.כתיבת פונקציה לזיהוי הערות 
+}
